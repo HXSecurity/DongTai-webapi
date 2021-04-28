@@ -173,23 +173,18 @@ class UserEndPoint(TalentAdminEndPoint):
     def put(self, request):
         try:
             password = request.data.get('password')
-            re_password = request.data.get('re_password')
-            if password and re_password and password != '' and password == re_password:
-                pass
-            else:
+            if self.invalid_password(password):
                 return JsonResponse({
                     "status": 204,
-                    "msg": '密码一致'
+                    "msg": '密码格式不正确'
                 })
 
             username = request.data.get('username')
-            if username:
-                exist_user = User.objects.filter(username=username).count()
-                if exist_user:
-                    return JsonResponse({
-                        "status": 205,
-                        "msg": '用户名已存在'
-                    })
+            if self.invalid_username(username):
+                return JsonResponse({
+                    "status": 205,
+                    "msg": '用户名已存在'
+                })
 
             talent = request.user.get_talent()
             department = request.data.get('department')
@@ -246,3 +241,21 @@ class UserEndPoint(TalentAdminEndPoint):
                 "status": 202,
                 "msg": "用户创建失败"
             })
+
+    @staticmethod
+    def invalid_username(username):
+        """
+        检验用户名是否正确
+        """
+        if username is None or username == '' or User.objects.filter(username=username).exists():
+            return True
+        return False
+
+    @staticmethod
+    def invalid_password(password):
+        """
+        验证密码格式是否正确
+        """
+        if password and password != '':
+            return False
+        return True

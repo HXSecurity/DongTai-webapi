@@ -21,11 +21,12 @@ class UserLogin(UserEndPoint):
     description = "用户登录"
 
     def post(self, request):
-        if self.is_sso(request) or self.verified_captcha(request):
+        if self.verified_captcha(request):
             if self.do_login(request):
-                return R.success(msg='登录成功')
-            else:
-                return R.failure(status=202, msg='登录失败')
+                status, data = self.do_login_atom(request)
+                if status:
+                    return R.success(msg='登录成功', data=data)
+            return R.failure(status=202, msg='登录失败')
         else:
             return R.failure(status=203, msg='验证码不正确')
 
@@ -42,6 +43,27 @@ class UserLogin(UserEndPoint):
             logger.error(f'login failed, reason: {e}')
             pass
         return False
+
+    @staticmethod
+    def do_login_atom(request):
+        from webapi.settings import ATOM_HOST
+        url = ATOM_HOST + '/v1/login'
+        data = {
+            'username': request.data['username'],
+            'password': request.data['password']
+        }
+        import requests
+        try:
+            resp = requests.post(url=url, data=data)
+            print(resp.text)
+            if resp.status_code == 200:
+                resp_data = resp.json()
+                if resp_data['errno'] == "0000":
+                    return True, resp_data['record']
+        except:
+            print("atom network error")
+            pass
+        return False, None
 
     @staticmethod
     def verified_captcha(request):

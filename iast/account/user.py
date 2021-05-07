@@ -4,6 +4,7 @@
 # datetime:2021/1/18 下午2:15
 # software: PyCharm
 # project: lingzhi-webapi
+import requests
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import Group
 from django.db import DatabaseError, transaction
@@ -119,6 +120,25 @@ class UserEndPoint(TalentAdminEndPoint):
 
                 user.save()
 
+                try:
+                    from webapi import settings
+                    body = {
+                        'username': user.get_full_name(),
+                        'email': email,
+                        'password': password,
+                        'confirmPassword': password,
+                        'userLevel': 0,
+                        'department': '超级管理员',
+                        'mobile': phone
+                    }
+                    headers = {
+                        'x-access-token': request.META['HTTP_X_ACCESS_TOKEN']
+                    }
+                    resp = requests.post(settings.ATOM_HOST + '/v1/user/edit', data=body, headers=headers)
+                    print(resp.text)
+                except:
+                    pass
+
                 return JsonResponse({
                     "status": 201,
                     "msg": "数据更新成功"
@@ -136,8 +156,17 @@ class UserEndPoint(TalentAdminEndPoint):
             })
 
     def delete(self, request, user_id):
+        def delete_atom_user(username):
+            try:
+                from webapi import settings
+                resp = requests.post(url=settings.ATOM_HOST + "v1/user/del", data={'username': username})
+                print(resp.text)
+            except:
+                pass
+
         user = User.objects.filter(id=user_id).first()
         username = user.get_full_name()
+        delete_atom_user(username)
         if self.check_permission_with_talent(request.user, user):
             agents = IastAgent.objects.filter(user=user)
             if agents:
@@ -176,7 +205,7 @@ class UserEndPoint(TalentAdminEndPoint):
             if self.invalid_password(password):
                 return JsonResponse({
                     "status": 204,
-                    "msg": '密码格式不正确'
+                    "msg": '密码格式不正确，正确格式：6-20位，必须包含字母、数字、特殊符号的两种以上'
                 })
 
             username = request.data.get('username')
@@ -227,6 +256,25 @@ class UserEndPoint(TalentAdminEndPoint):
                         "msg": "用户创建失败"
                     })
 
+                try:
+                    from webapi import settings
+                    body = {
+                        'username': username,
+                        'email': email,
+                        'password': password,
+                        'confirmPassword': password,
+                        'userLevel': 0,
+                        'department': '超级管理员',
+                        'mobile': phone
+                    }
+                    headers = {
+                        'x-access-token': request.META['HTTP_X_ACCESS_TOKEN']
+                    }
+                    resp = requests.post(settings.ATOM_HOST + '/v1/user', data=body, headers=headers)
+                    print(resp.text)
+                except:
+                    pass
+
                 return JsonResponse({
                     "status": 201,
                     "msg": f"用户{username}创建成功"
@@ -256,6 +304,8 @@ class UserEndPoint(TalentAdminEndPoint):
         """
         验证密码格式是否正确
         """
-        if password and password != '':
+        import re
+        rule = '^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{6,20}$'
+        if password and password != '' and len(password) >= 6 and re.findall(rule, password):
             return False
         return True

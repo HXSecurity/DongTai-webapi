@@ -35,6 +35,7 @@ from iast.views.engine_hook_rule_type_enable import EngineHookRuleTypeEnableEndP
 from iast.views.engine_hook_rule_types import EngineHookRuleTypesEndPoint
 from iast.views.engine_hook_rules import EngineHookRulesEndPoint
 from iast.views.engine_method_pool_detail import MethodPoolDetailProxy
+from iast.views.engine_method_pool_search import MethodPoolSearchProxy
 from iast.views.engine_vul_rule import EngineVulRuleEndPoint
 from iast.views.engine_vul_rule_detail import EngineVulRuleDetailEndPoint
 from iast.views.engine_vul_rule_save import EngineVulRuleSaveEndPoint
@@ -43,8 +44,6 @@ from iast.views.log_clear import LogClear
 from iast.views.log_delete import LogDelete
 from iast.views.log_export import LogExport
 from iast.views.logs import LogsEndpoint
-from iast.views.engine_method_pool_search import MethodPoolSearchProxy
-from iast.views.engine_method_pools import MethodPoolProxy
 from iast.views.openapi import OpenApiEndpoint
 from iast.views.project_add import ProjectAdd
 from iast.views.project_delete import ProjectDel
@@ -163,7 +162,6 @@ urlpatterns = [
     path('log/clear', LogClear.as_view()),
 
     # 方法池相关
-    # path('method_pools', MethodPoolProxy.as_view()),
     path('engine/method_pool/search', MethodPoolSearchProxy.as_view()),
     path('engine/method_pool/detail', MethodPoolDetailProxy.as_view()),
     path('engine/vul_rule', EngineVulRuleEndPoint.as_view()),

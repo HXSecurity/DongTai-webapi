@@ -10,11 +10,11 @@ import re
 import time
 
 from base.endpoint import MixinAuthEndPoint
-from iast.models.agent import IastAgent
-from iast.models.asset import Asset
-from iast.models.project import IastProject
-from iast.models.server import IastServerModel
-from iast.models.vulnerablity import IastVulnerabilityModel
+from dongtai_models.models.agent import IastAgent
+from dongtai_models.models.asset import Asset
+from dongtai_models.models.project import IastProject
+from dongtai_models.models.server import IastServerModel
+from dongtai_models.models.vulnerablity import IastVulnerabilityModel
 from iast.permissions import ScopedPermission
 
 
@@ -51,12 +51,12 @@ def get_agentId_project_id(project_id, queryset, user):
 
 # 获取用户所有项目
 def get_user_project_name(auth_users):
-    proInfo = IastProject.objects.filter(user__in=auth_users).values("id", "name")
-    result = {}
-    if proInfo:
-        for item in proInfo:
-            result[item['id']] = item['name']
-    return result
+    project_models = IastProject.objects.filter(user__in=auth_users).values("id", "name")
+    projects_info = {}
+    if project_models:
+        for item in project_models:
+            projects_info[item['id']] = item['name']
+    return projects_info
 
 
 # 获取用户所有agent项目ID

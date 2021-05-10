@@ -10,10 +10,10 @@ from rest_framework.request import Request
 
 from base import R
 from iast.base.sca import ScaEndPoint
-from iast.models.asset import Asset
-from iast.models.project import IastProject
-from iast.models.sca_artifact_db import ScaArtifactDb
-from iast.models.sca_maven_artifact import ScaMavenArtifact
+from dongtai_models.models.asset import Asset
+from dongtai_models.models.project import IastProject
+from dongtai_models.models.sca_artifact_db import ScaArtifactDb
+from dongtai_models.models.sca_maven_artifact import ScaMavenArtifact
 from iast.serializers.sca import ScaSerializer
 
 logger = logging.getLogger('dongtai-webapi')
@@ -32,17 +32,14 @@ class ScaDetailView(ScaEndPoint):
         try:
             agents = self.get_auth_agents_with_user(user)
             dependency = Asset.objects.filter(agent__in=agents, id=id).first()
-            # if user.is_talent_admin():
-            #     sca_data = Asset.objects.get(id=id)
-            # else:
-            #     sca_data = Asset.objects.get(user=user, id=id)
+
             if dependency is None:
                 return R.failure(msg='组件不存在或无权限访问')
             data = ScaSerializer(dependency).data
             project_id = dependency.agent.bind_project_id
-            iast_info = IastProject.objects.filter(id=project_id).first()
+            iast_info = IastProject.objects.values('name').filter(id=project_id).first()
             if iast_info:
-                data['project_name'] = iast_info.name
+                data['project_name'] = iast_info['name']
             else:
                 data['project_name'] = ""
             data['vuls'] = list()

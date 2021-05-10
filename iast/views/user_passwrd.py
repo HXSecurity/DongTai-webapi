@@ -27,10 +27,11 @@ class UserPassword(UserEndPoint):
                 password = request.data['new_password']
 
                 user.set_password(password)
-                user.save()
+                user.save(update_fields=['password'])
                 self.modify_atom_password(username=user.username, password=request.data['new_password'],
                                           old_password=request.data['old_password'],
                                           access_token=request.META['HTTP_X_ACCESS_TOKEN'])
+
                 return R.success(msg='密码修改成功')
             else:
                 return R.failure(msg='原始密码错误')

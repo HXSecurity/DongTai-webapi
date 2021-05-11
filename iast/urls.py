@@ -52,6 +52,8 @@ from iast.views.project_engines import ProjectEngines
 from iast.views.project_report_export import ProjectReportExport
 from iast.views.project_summary import ProjectSummary
 from iast.views.projects import Projects
+from iast.views.roles import RolesEndPoint
+from iast.views.route import RouteEndPoint
 from iast.views.sca_details import ScaDetailView
 from iast.views.sca_sidebar_index import ScaSidebarList
 from iast.views.sca_summary import ScaSummary
@@ -102,6 +104,13 @@ urlpatterns = [
     path('user/info', UserInfoEndpoint.as_view()),
     path('user/token', UserToken.as_view()),
     path('user/register', UserRegisterEndPoint.as_view()),
+
+    # 角色管理
+    path('route', RouteEndPoint.as_view()),
+    path('roles', RolesEndPoint.as_view()),
+    path('role/add', RolesEndPoint.as_view()),
+    path('role/<int:role_id>/delete', RolesEndPoint.as_view()),
+    path('role/<int:role_id>', RolesEndPoint.as_view()),
 
     # 验证码相关
     path('captcha/', include('captcha.urls')),

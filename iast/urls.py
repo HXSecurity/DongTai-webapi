@@ -52,6 +52,7 @@ from iast.views.project_engines import ProjectEngines
 from iast.views.project_report_export import ProjectReportExport
 from iast.views.project_summary import ProjectSummary
 from iast.views.projects import Projects
+from iast.views.role_name import RoleNameEndPoint
 from iast.views.roles import RolesEndPoint
 from iast.views.route import RouteEndPoint
 from iast.views.sca_details import ScaDetailView
@@ -108,6 +109,7 @@ urlpatterns = [
     # 角色管理
     path('route', RouteEndPoint.as_view()),
     path('roles', RolesEndPoint.as_view()),
+    path('rolenames', RoleNameEndPoint.as_view()),
     path('role/add', RolesEndPoint.as_view()),
     path('role/<int:role_id>/delete', RolesEndPoint.as_view()),
     path('role/<int:role_id>', RolesEndPoint.as_view()),

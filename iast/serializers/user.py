@@ -12,6 +12,7 @@ from dongtai_models.models import User
 class UserSerializer(serializers.ModelSerializer):
     department = serializers.SerializerMethodField()
     talent = serializers.SerializerMethodField()
+    is_superuser = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -25,3 +26,6 @@ class UserSerializer(serializers.ModelSerializer):
     def get_talent(self, obj):
         talent = obj.get_talent()
         return talent.get_talent_name() if talent else ''
+
+    def get_is_superuser(self, obj):
+        return obj.groups.get().id

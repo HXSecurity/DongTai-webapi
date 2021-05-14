@@ -95,9 +95,13 @@ class UserEndPoint(TalentAdminEndPoint):
                         # todo 删除历史部门与用户的关系
                         user.department.set(department)
 
-                role = int(request.data.get("role", 0))
-                if role and role != user.is_superuser and role in [0, 2]:
-                    user.is_superuser = role
+                role = int(request.data.get("role"))
+                group = user.groups.get()
+                group.user_set.remove(user)
+
+                new_group = Group.objects.filter(id=role).first()
+                if new_group:
+                    new_group.user_set.add(user)
 
                 email = request.data.get('email')
                 if email and email != user.email:
@@ -121,23 +125,25 @@ class UserEndPoint(TalentAdminEndPoint):
                 user.save()
 
                 try:
-                    from webapi import settings
-                    body = {
-                        'username': user.get_full_name(),
-                        'email': email,
-                        'password': password,
-                        'confirmPassword': password,
-                        'userLevel': 0,
-                        'department': '超级管理员',
-                        'mobile': phone
-                    }
-                    headers = {
-                        'x-access-token': request.META['HTTP_X_ACCESS_TOKEN']
-                    }
-                    resp = requests.post(settings.ATOM_HOST + '/v1/user/edit', data=body, headers=headers)
-                    print(resp.text)
+                    if email and phone and password and password != '':
+                        from webapi import settings
+                        body = {
+                            'username': user.get_full_name(),
+                            'email': email,
+                            'password': password,
+                            'confirmPassword': password,
+                            'userLevel': 0,
+                            'department': '超级管理员',
+                            'mobile': phone
+                        }
+                        headers = {
+                            'x-access-token': request.META['HTTP_X_ACCESS_TOKEN']
+                        }
+                        resp = requests.post(settings.ATOM_HOST + '/v1/user/edit', data=body, headers=headers,
+                                             verify=False)
+                        print(resp.text)
                 except:
-                    pass
+                    print("【atom】用户信息修改失败")
 
                 return JsonResponse({
                     "status": 201,
@@ -159,10 +165,10 @@ class UserEndPoint(TalentAdminEndPoint):
         def delete_atom_user(username):
             try:
                 from webapi import settings
-                resp = requests.post(url=settings.ATOM_HOST + "v1/user/del", data={'username': username})
+                resp = requests.post(url=settings.ATOM_HOST + "v1/user/del", data={'username': username}, verify=False)
                 print(resp.text)
             except:
-                pass
+                print("【atom】用户删除失败")
 
         user = User.objects.filter(id=user_id).first()
         username = user.get_full_name()
@@ -270,10 +276,14 @@ class UserEndPoint(TalentAdminEndPoint):
                     headers = {
                         'x-access-token': request.META['HTTP_X_ACCESS_TOKEN']
                     }
-                    resp = requests.post(settings.ATOM_HOST + '/v1/user', data=body, headers=headers)
+                    print(f'开始创建atom用户，body={body}, header={headers}')
+                    resp = requests.post(settings.ATOM_HOST + '/v1/user', data=body, headers=headers, verify=False)
                     print(resp.text)
                 except:
-                    pass
+                    return JsonResponse({
+                        "status": 202,
+                        "msg": "用户创建失败"
+                    })
 
                 return JsonResponse({
                     "status": 201,
@@ -287,7 +297,7 @@ class UserEndPoint(TalentAdminEndPoint):
         except Exception as e:
             return JsonResponse({
                 "status": 202,
-                "msg": "用户创建失败"
+                "msg": f"用户创建失败，原因：{e}"
             })
 
     @staticmethod

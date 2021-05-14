@@ -17,6 +17,11 @@ class RolesEndPoint(TalentAdminEndPoint):
         page = request.query_params.get('page', 1)
         page_size = request.query_params.get('pageSize', 10)
 
+        role_name = request.query_params.get('name')
+        if role_name:
+            groups = Group.objects.filter(name__icontains=role_name)
+            queryset = queryset.filter(group__in=groups)
+
         try:
             page_summary, queryset = self.get_paginator(queryset, page, page_size)
 

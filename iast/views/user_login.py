@@ -54,7 +54,7 @@ class UserLogin(UserEndPoint):
         }
         import requests
         try:
-            resp = requests.post(url=url, data=data)
+            resp = requests.post(url=url, data=data, verify=False)
             print(resp.text)
             if resp.status_code == 200:
                 resp_data = resp.json()

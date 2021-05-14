@@ -49,7 +49,7 @@ class UserPassword(UserEndPoint):
             headers = {
                 'x-access-token': access_token
             }
-            resp = requests.post(url=settings.ATOM_HOST + "/v1/user/modifypwd", data=body, headers=headers)
+            resp = requests.post(url=settings.ATOM_HOST + "/v1/user/modifypwd", data=body, headers=headers, verify=False)
             print(resp.text)
             return True
         except:

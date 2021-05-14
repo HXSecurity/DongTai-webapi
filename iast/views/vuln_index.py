@@ -62,9 +62,14 @@ class VulnList(UserEndPoint):
 
         project_id = request.query_params.get('project_id')
         if project_id:
-            agents = self.get_auth_agents(auth_users).filter(bind_project_id=project_id)
+            auth_agents = self.get_auth_agents(auth_users)
+            agents = auth_agents.filter(bind_project_id=project_id)
             if agents:
                 queryset = queryset.filter(agent_id__in=agents)
+            elif auth_agents:
+                queryset = queryset.filter(agent_id__in=auth_agents)
+            else:
+                return R.success(data=[])
 
         url = request.query_params.get('url', None)
         if url and url != '':

@@ -31,7 +31,6 @@ class AgentDeleteEndPoint(UserEndPoint):
             queryset = IastAgent.objects.filter(user=user, id=pk).first()
             if queryset:
                 self.agent = queryset
-                # todo 删除agent
                 self.delete_error_log()
                 self.delete_heart_beat()
                 self.delete_vul_overpower()
@@ -50,7 +49,6 @@ class AgentDeleteEndPoint(UserEndPoint):
             return R.failure(msg="删除过程出错，请稍后重试")
 
     def delete_server(self):
-        # fixme 测试下面的删除方法是否有效
         server = self.agent.server
         server.agents.all().delete()
         server.delete()

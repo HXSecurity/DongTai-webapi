@@ -36,6 +36,7 @@ SECRET_KEY = ranstr(50)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("debug", 'false') == 'true'
+DEBUG = True
 
 # READ CONFIG FILE
 config = ConfigParser()
@@ -216,23 +217,24 @@ CAPTCHA_TIMEOUT = 1  # 超时(minutes)
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'handlers': {
         'console': {
-            'class': 'logging.StreamHandler',
+            'class': 'logging.StreamHandler'
         },
         'dongtai-webapi': {
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': 'logs/apiserver.log',
             'backupCount': 5,
             'maxBytes': 1024 * 1024 * 10,
+            'encoding': 'utf8'
         },
     },
     'loggers': {
-        'django.db.backends': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
+        # 'django.db.backends': {
+        #     'handlers': ['console'],
+        #     'level': 'DEBUG',
+        # },
         'dongtai-webapi': {
             'handlers': ['console', 'dongtai-webapi'],
             'propagate': True,
@@ -257,5 +259,4 @@ EMAIL_FROM_ADDR = config.get('smtp', 'from_addr')
 ENABLE_SSL = config.get('smtp', 'ssl') == 'True'
 ADMIN_EMAIL = config.get('smtp', 'cc_addr')
 
-# ATOM_HOST = 'https://192.168.0.126'
 ATOM_HOST = 'https://env'

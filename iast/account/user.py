@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 # author:owefsad
-# datetime:2021/1/18 下午2:15
+# datetime:2021/1/18
 # software: PyCharm
 # project: lingzhi-webapi
 import requests
@@ -51,11 +51,6 @@ class UserEndPoint(TalentAdminEndPoint):
         return user.is_system_admin() or talent == target_talent
 
     def get(self, request):
-        """
-        获取用户列表
-        :param request:
-        :return:
-        """
         keywords = request.query_params.get('keywords')
         department_id = request.query_params.get('departmentId')
 
@@ -79,21 +74,23 @@ class UserEndPoint(TalentAdminEndPoint):
                 "total": page_summary['alltotal']
             })
         except ValueError as e:
-            return R.failure(msg='page和pageSize必须是数字')
+            return R.failure(msg='page and pageSize must be number')
 
     def post(self, request, user_id):
         try:
             user = User.objects.get(id=user_id)
             talent = user.get_talent()
             if self.check_permission_with_talent(request.user, user):
-                # 检查
                 department = request.data.get('department')
                 department_name = department.get('name', None)
                 if department_name and department_name != user.department.get().get_department_name():
                     department = talent.departments.filter(name=department_name).first()
                     if department:
-                        # todo 删除历史部门与用户的关系
                         user.department.set(department)
+
+                level = int(request.data.get("level", 0))
+                if level and level != user.is_superuser and level in [0, 2]:
+                    user.is_superuser = level
 
                 role = int(request.data.get("role"))
                 group = user.groups.get()
@@ -119,7 +116,7 @@ class UserEndPoint(TalentAdminEndPoint):
                     else:
                         return JsonResponse({
                             "status": 203,
-                            "msg": "原始密码不正确"
+                            "msg": "origin password invalid"
                         })
 
                 user.save()
@@ -128,26 +125,27 @@ class UserEndPoint(TalentAdminEndPoint):
                     if email and phone and password and password != '':
                         from webapi import settings
                         body = {
-                            'username': user.get_full_name(),
+                            'username': user.get_username(),
                             'email': email,
                             'password': password,
                             'confirmPassword': password,
                             'userLevel': 0,
-                            'department': '超级管理员',
+                            'department': 'iast-department',
                             'mobile': phone
                         }
                         headers = {
                             'x-access-token': request.META['HTTP_X_ACCESS_TOKEN']
                         }
+                        print(f'update atom user with data: body={body}, header={headers}')
                         resp = requests.post(settings.ATOM_HOST + '/v1/user/edit', data=body, headers=headers,
                                              verify=False)
                         print(resp.text)
                 except:
-                    print("【atom】用户信息修改失败")
+                    print("[atom]user info edit failure")
 
                 return JsonResponse({
                     "status": 201,
-                    "msg": "数据更新成功"
+                    "msg": "user info update successful"
                 })
             else:
                 return JsonResponse({
@@ -162,16 +160,24 @@ class UserEndPoint(TalentAdminEndPoint):
             })
 
     def delete(self, request, user_id):
-        def delete_atom_user(username):
+        def delete_atom_user(_username):
             try:
                 from webapi import settings
-                resp = requests.post(url=settings.ATOM_HOST + "v1/user/del", data={'username': username}, verify=False)
+                headers = {
+                    'x-access-token': request.META['HTTP_X_ACCESS_TOKEN']
+                }
+                body = {'username': _username}
+                print(f'delete atom user with data: url=/v1/user/del,  body={body}, header={headers}')
+                resp = requests.post(url=settings.ATOM_HOST + "/v1/user/del", headers=headers, data=body, verify=False)
                 print(resp.text)
-            except:
-                print("【atom】用户删除失败")
+            except Exception as e:
+                print(f"[atom] user delete failure, reason: {e}")
 
+        print(f'delete user {user_id}')
         user = User.objects.filter(id=user_id).first()
-        username = user.get_full_name()
+        print(f'delete user {user}')
+        username = user.get_username()
+        print(f'delete user {username}')
         delete_atom_user(username)
         if self.check_permission_with_talent(request.user, user):
             agents = IastAgent.objects.filter(user=user)
@@ -196,29 +202,30 @@ class UserEndPoint(TalentAdminEndPoint):
             except:
                 return JsonResponse({
                     "status": 202,
-                    "msg": f"用户{username}删除失败"
+                    "msg": f"user {username} delete failure"
                 })
 
         return JsonResponse({
             "status": 201,
-            "msg": f"用户{username}删除成功"
+            "msg": f"user {username} delete failure"
         })
 
     @transaction.atomic
     def put(self, request):
         try:
+            print('start create user')
             password = request.data.get('password')
             if self.invalid_password(password):
                 return JsonResponse({
-                    "status": 204,
+                    "status": 209,
                     "msg": '密码格式不正确，正确格式：6-20位，必须包含字母、数字、特殊符号的两种以上'
                 })
 
             username = request.data.get('username')
             if self.invalid_username(username):
                 return JsonResponse({
-                    "status": 205,
-                    "msg": '用户名已存在'
+                    "status": 208,
+                    "msg": 'username exist'
                 })
 
             talent = request.user.get_talent()
@@ -226,43 +233,16 @@ class UserEndPoint(TalentAdminEndPoint):
             department_id = department.get('id')
             if department_id is None:
                 return JsonResponse({
-                    "status": 204,
-                    "msg": '部门不存在'
+                    "status": 207,
+                    "msg": 'department invalid'
                 })
 
             _department = talent.departments.filter(id=department_id).first()
             if _department:
                 email = request.data.get('email')
-                role = request.data.get('role')
                 phone = request.data.get('phone')
-
-                if role == 0:
-                    new_user = User.objects.create_user(
-                        username=username,
-                        password=password,
-                        email=email,
-                        phone=phone
-                    )
-                    _department.users.add(new_user)
-                    group, success = Group.objects.get_or_create(name='user')
-                    group.user_set.add(new_user)
-                elif role == 2:
-                    new_user = User.objects.create_talent_user(
-                        username=username,
-                        password=password,
-                        email=email,
-                        phone=phone
-                    )
-                    _department.users.add(new_user)
-                    group, success = Group.objects.get_or_create(name='talent_admin')
-                    group.user_set.add(new_user)
-                else:
-                    return JsonResponse({
-                        "status": 202,
-                        "msg": "用户创建失败"
-                    })
-
                 try:
+                    print('start create atom user')
                     from webapi import settings
                     body = {
                         'username': username,
@@ -270,34 +250,80 @@ class UserEndPoint(TalentAdminEndPoint):
                         'password': password,
                         'confirmPassword': password,
                         'userLevel': 0,
-                        'department': '超级管理员',
+                        'department': 'iast-department',
                         'mobile': phone
                     }
                     headers = {
                         'x-access-token': request.META['HTTP_X_ACCESS_TOKEN']
                     }
-                    print(f'开始创建atom用户，body={body}, header={headers}')
+                    print(f'create atom user with data: body={body}, header={headers}')
                     resp = requests.post(settings.ATOM_HOST + '/v1/user', data=body, headers=headers, verify=False)
-                    print(resp.text)
-                except:
+                    print(f'create atom user with response: {resp.text}')
+                    atom_resp = resp.json()
+                    if atom_resp['errno'] == '0000':
+                        pass
+                    else:
+                        return JsonResponse({
+                            "status": 206,
+                            "msg": atom_resp['error']
+                        })
+                except Exception as e:
+                    print(f"atom user create failure, reason: {e}")
                     return JsonResponse({
-                        "status": 202,
-                        "msg": "用户创建失败"
+                        "status": 205,
+                        "msg": "atom user create failure"
                     })
 
+                try:
+                    level = int(request.data.get("level", 0))
+                    if level == 0:
+                        new_user = User.objects.create_user(
+                            username=username,
+                            password=password,
+                            email=email,
+                            phone=phone
+                        )
+                    elif level == 2:
+                        new_user = User.objects.create_talent_user(
+                            username=username,
+                            password=password,
+                            email=email,
+                            phone=phone
+                        )
+                    else:
+                        return JsonResponse({
+                            "status": 202,
+                            "msg": "user create failure"
+                        })
+
+                    _department.users.add(new_user)
+                    role = int(request.data.get("role"))
+                    group = Group.objects.filter(id=role).first()
+                    if group:
+                        group.user_set.add(new_user)
+                    else:
+                        return JsonResponse({
+                            "status": 206,
+                            "msg": "role invalid"
+                        })
+                except Exception as e:
+                    return JsonResponse({
+                        "status": 202,
+                        "msg": f"user create failure, reason：{e}"
+                    })
                 return JsonResponse({
                     "status": 201,
-                    "msg": f"用户{username}创建成功"
+                    "msg": f"user {username} create success"
                 })
             else:
                 return JsonResponse({
                     "status": 203,
-                    "msg": "部门不存在或无访问权限"
+                    "msg": "department invalid"
                 })
         except Exception as e:
             return JsonResponse({
-                "status": 202,
-                "msg": f"用户创建失败，原因：{e}"
+                "status": 204,
+                "msg": f"create failure, reason: {e}"
             })
 
     @staticmethod

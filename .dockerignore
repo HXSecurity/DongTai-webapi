@@ -1,2 +1,3 @@
 /venv
 /*.docx
+build_docker.sh

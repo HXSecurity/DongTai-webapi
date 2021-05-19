@@ -26,6 +26,8 @@ class UserLogin(UserEndPoint):
                 status, data = self.do_login_atom(request)
                 if status:
                     return R.success(msg='登录成功', data=data)
+                else:
+                    return R.failure(status=204, msg='登陆失败')
             return R.failure(status=202, msg='登录失败')
         else:
             return R.failure(status=203, msg='验证码不正确')

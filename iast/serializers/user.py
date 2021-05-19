@@ -12,11 +12,11 @@ from dongtai_models.models import User
 class UserSerializer(serializers.ModelSerializer):
     department = serializers.SerializerMethodField()
     talent = serializers.SerializerMethodField()
-    is_superuser = serializers.SerializerMethodField()
+    role = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'is_superuser', 'phone', 'talent', 'department', 'is_active',
+        fields = ['id', 'username', 'email', 'is_superuser', 'role', 'phone', 'talent', 'department', 'is_active',
                   'date_joined', 'last_login']
 
     def get_department(self, obj):
@@ -27,5 +27,5 @@ class UserSerializer(serializers.ModelSerializer):
         talent = obj.get_talent()
         return talent.get_talent_name() if talent else ''
 
-    def get_is_superuser(self, obj):
+    def get_role(self, obj):
         return obj.groups.get().id

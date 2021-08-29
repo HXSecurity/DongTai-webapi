@@ -100,7 +100,9 @@ LANGUAGES = (
 USE_I18N = True
 USE_L10N = True
 MODELTRANSLATION_FALLBACK_LANGUAGES = ('zh', 'en')
-MIDDLEWARE = [
+
+MIDDLEWARE = ['iast.utils.CrossDomainSessionMiddleware'] if os.getenv('environment', None) in ('TEST', 'PROD') else []
+MIDDLEWARE.extend([
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -111,7 +113,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+])
 
 XFF_TRUSTED_PROXY_DEPTH = 5
 
@@ -129,7 +131,6 @@ CSRF_TRUSTED_ORIGINS = (
 CSRF_COOKIE_AGE = 60 * 60 * 24
 
 AGENT_UPGRADE_URL = "https://www.huoxian.cn"
-
 
 CORS_ORIGIN_REGEX_WHITELIST = [
     r"^https://\w+\.huoxian.cn:(\:\d+)?$"
@@ -177,8 +178,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'webapi.wsgi.application'
 
-if  len(sys.argv) > 1 and sys.argv[1] in ('test', 'makemigrations',
-                                         'sqlmigrate','migrate'):
+if len(sys.argv) > 1 and sys.argv[1] in ('test', 'makemigrations',
+                                         'sqlmigrate', 'migrate'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -190,16 +191,14 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'OPTIONS': {
-                'charset': 'utf8mb4'
+                'charset': 'utf8mb4',
+                'init_command': 'SET max_execution_time=20000'
             },
             'USER': config.get("mysql", 'user'),
             'NAME': config.get("mysql", 'name'),
             'PASSWORD': config.get("mysql", 'password'),
             'HOST': config.get("mysql", 'host'),
             'PORT': config.get("mysql", 'port'),
-            'OPTIONS': {
-                'init_command': 'SET max_execution_time=20000'
-            },
         }
     }
 CACHES = {
@@ -211,7 +210,7 @@ CACHES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME':
-        'django.contrib.auth.password_validation.MinimumLengthValidator',
+            'django.contrib.auth.password_validation.MinimumLengthValidator',
         'OPTIONS': {
             'min_length': 6,
         }
@@ -230,7 +229,6 @@ USE_L10N = True
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'iast', 'upload')
 MEDIA_URL = "/upload/masterimg/"
-
 
 CAPTCHA_IMAGE_SIZE = (80, 45)
 CAPTCHA_LENGTH = 4
@@ -275,7 +273,6 @@ REST_PROXY = {
     'HOST': config.get("engine", 'url'),
 }
 
-
 # notify
 EMAIL_SERVER = config.get('smtp', 'server')
 EMAIL_USER = config.get('smtp', 'user')
@@ -283,6 +280,8 @@ EMAIL_PASSWORD = config.get('smtp', 'password')
 EMAIL_FROM_ADDR = config.get('smtp', 'from_addr')
 ENABLE_SSL = config.get('smtp', 'ssl') == 'True'
 ADMIN_EMAIL = config.get('smtp', 'cc_addr')
+
+SESSION_COOKIE_NAME = 'DTSessionId'
 SESSION_COOKIE_DOMAIN = None
 CSRF_COOKIE_DOMAIN = None
 if os.getenv('environment', 'PROD') == 'TEST':
@@ -294,6 +293,6 @@ if os.getenv('environment', 'PROD') == 'TEST':
         'DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
 if os.getenv('environment', None) in ('TEST', 'PROD'):
     SESSION_COOKIE_DOMAIN = config.get('other',
-                                            'demo_session_cookie_domain')
+                                       'demo_session_cookie_domain')
     CSRF_COOKIE_DOMAIN = SESSION_COOKIE_DOMAIN
     DOMAIN = config.get('other', 'domain')

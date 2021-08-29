@@ -5,16 +5,22 @@
 # software: Vim8
 # project: webapi
 
-from functools import reduce
-from django.db.models import Q
-import operator
 import hashlib
-from dongtai.models.api_route import IastApiRoute, IastApiMethod, IastApiRoute, HttpMethod, IastApiResponse, IastApiMethodHttpMethodRelation
+import operator
+from functools import reduce
+
+from django.db.models import Q
 from dongtai.models.agent_method_pool import MethodPool
-from rest_framework.serializers import Serializer
+from dongtai.models.api_route import HttpMethod, IastApiMethodHttpMethodRelation
+
+from webapi import settings
 
 
-def get_model_field(model, exclude=[], include=[]):
+def get_model_field(model, exclude=None, include=None):
+    if include is None:
+        include = []
+    if exclude is None:
+        exclude = []
     fields = [field.name for field in model._meta.fields]
     if include:
         return [
@@ -38,8 +44,16 @@ def assemble_query(condictions: dict,
                         kv_pair[1]
                 }, condictions)), base_query)
 
+
 from rest_framework.serializers import SerializerMetaclass
-def extend_schema_with_envcheck(querys: list = [], request_body: list = []):
+
+
+def extend_schema_with_envcheck(querys=None, request_body=None):
+    if request_body is None:
+        request_body = []
+    if querys is None:
+        querys = []
+
     def myextend_schema(func):
         import os
         if os.getenv('environment', None) == 'TEST':
@@ -55,6 +69,7 @@ def extend_schema_with_envcheck(querys: list = [], request_body: list = []):
             funcw.request_body = request_body
             return funcw
         return func
+
     return myextend_schema
 
 
@@ -101,7 +116,11 @@ def apiroute_cachekey(api_route, agents, http_method=None):
 
 def sha1(string, encoding='utf-8'):
     return hashlib.sha1(string.encode(encoding)).hexdigest()
+
+
 from dongtai.models.profile import IastProfile
+
+
 def get_openapi():
     profilefromdb = IastProfile.objects.filter(
         key='apiserver').values_list('value', flat=True).first()
@@ -112,7 +131,9 @@ def get_openapi():
         return None
     return profiles[0]
 
+
 from urllib.parse import urlparse
+
 
 def validate_url(url):
     try:
@@ -120,14 +141,11 @@ def validate_url(url):
         return all([result.scheme, result.netloc])
     except:
         return False
-    return True
-
 
 
 import requests
 import json
 import logging
-from django.utils.translation import get_language
 from requests.exceptions import ConnectionError, ConnectTimeout
 
 logger = logging.getLogger('dongtai-webapi')
@@ -147,3 +165,19 @@ def checkopenapistatus(openapiurl, token):
         logger.info("HealthView_{}:{}".format(openapiurl, e))
         return False, None
     return True, resp
+
+
+class CrossDomainSessionMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if settings.SESSION_COOKIE_DOMAIN is None or response.cookies is not None:
+            host = request.get_host()
+            if host not in settings.SESSION_COOKIE_DOMAIN:
+                domain = ".{domain}".format(domain=host)
+                for cookie in response.cookies:
+                    if 'domain' in response.cookies[cookie]:
+                        response.cookies[cookie]['domain'] = domain
+        return response

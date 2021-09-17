@@ -88,20 +88,4 @@ def get_github_contributors(dic={}, update=False):
         dic['issues'] = _get_github_issues()
         dic['prs'] = _get_github_prs()
         dic['time'] = int(time.time())
-        expired = True if 60 * 60 - (int(time.time()) -
-                                     dic['time']) < 0 else False
-        return dic, expired
-    if dic == {} or dic.get('issues', None) == {} or dic.get('prs',
-                                                             None) == {}:
-        dic['issues'] = _get_github_issues()
-        dic['prs'] = _get_github_prs()
-        dic['time'] = int(time.time())
-        expired = True if 60*60 - (int(time.time()) - dic['time']) < 0 else False
-    else:
-        expired = True if 60 * 60 - (int(time.time()) -
-                                     dic['time']) < 0 else False
-        if expired:
-            dic['issues'] = _get_github_issues()
-            dic['prs'] = _get_github_prs()
-            dic['time'] = int(time.time())
-    return dic, expired
+    return dic

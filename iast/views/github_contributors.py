@@ -10,8 +10,37 @@
 
 from dongtai.endpoint import R, AnonymousAndUserEndPoint
 from iast.github_contributors import get_github_contributors
+import threading
+import asyncio
+from functools import partial
+import threading
+
+
+async def delay(time):
+    await asyncio.sleep(time)
+
+
+async def timer(time, function):
+    while True:
+        future = asyncio.ensure_future(delay(time))
+        future.add_done_callback(function)
+        await future
+
+
+_update = partial(get_github_contributors, update=True)
+
+
+def corotheard():
+    _update()
+    asyncio.run(timer(60 * 60, _update))
+
+
+t1 = threading.Thread(target=corotheard)
+t1.start()
+
+
 
 class GithubContributorsView(AnonymousAndUserEndPoint):
     def get(self, request):
-        dic, expired = get_github_contributors()
+        dic = get_github_contributors()
         return R.success(data=dic)

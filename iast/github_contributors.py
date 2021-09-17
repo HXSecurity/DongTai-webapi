@@ -52,13 +52,12 @@ def key_filiter(dic, keylist):
 
 
 def _get_github_user(url_list=URL_LIST, suffix='pulls?state=all'):
-
     total_users = {}
     user_count = {}
     for url in url_list:
         resp = requests.get(urljoin(url, suffix))
         if resp.status_code == 403:
-            return {}
+            continue
         res = json.loads(resp.content)
         repo_users = list(map(lambda x: x['user'], res))
         repo_users_dic = {_['id']: _ for _ in repo_users}

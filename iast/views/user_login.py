@@ -9,6 +9,9 @@ from dongtai.endpoint import R
 from dongtai.endpoint import UserEndPoint
 from django.utils.translation import gettext_lazy as _
 import time
+from django.http import JsonResponse
+from iast.utils import parse_x_host
+from webapi.settings import CSRF_COOKIE_NAME
 
 logger = logging.getLogger("dongtai-webapi")
 
@@ -38,7 +41,12 @@ class UserLogin(UserEndPoint):
                 user = authenticate(username=username, password=password)
                 if user is not None and user.is_active:
                     login(request, user)
-                    return R.success(msg=_('Login successful'))
+                    res = R.success(msg=_('Login successful'))
+                    host = parse_x_host(request)
+                    if host:
+                        res.set_cookie('sessionid', domain=host)
+                        res.set_cookie(CSRF_COOKIE_NAME, domain=host)
+                    return res
                 else:
                     logger.warn(
                         f"user [{username}] login failure, rease: {'user not exist' if user is None else 'user is disable'}")
@@ -47,3 +55,4 @@ class UserLogin(UserEndPoint):
                 return R.failure(status=203, msg=_('Verification code error'))
         else:
             return R.failure(status=204, msg=_('verification code should not be empty'))
+

@@ -106,6 +106,7 @@ from iast.views.health import HealthView
 from iast.views.oss_health import OssHealthView
 from iast.views.github_contributors import GithubContributorsView
 
+
 urlpatterns = [
     path("talents", TalentEndPoint.as_view()),
     path("talent/<int:pk>", TalentEndPoint.as_view()),

@@ -13,7 +13,7 @@ import asyncio
 from functools import partial
 import os
 
-if os.getenv('environment', None) in ('TEST', 'PROD'):
+if os.getenv('environment', None) in ('PROD', ):
 
     async def delay(time):
         await asyncio.sleep(time)
@@ -28,9 +28,9 @@ if os.getenv('environment', None) in ('TEST', 'PROD'):
 
     def corotheard():
         _update()
-        asyncio.run(timer(60 * 60, _update))
+        asyncio.run(timer(60 * 90, _update))
 
-    t1 = threading.Thread(target=corotheard)
+    t1 = threading.Thread(target=corotheard, daemon=True)
     t1.start()
 
 

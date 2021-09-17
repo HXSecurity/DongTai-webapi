@@ -296,7 +296,10 @@ if os.getenv('environment', 'PROD') == 'TEST':
     REST_FRAMEWORK[
         'DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
 if os.getenv('environment', None) in ('TEST', 'PROD'):
-    SESSION_COOKIE_DOMAIN = config.get('other',
-                                            'demo_session_cookie_domain')
+    HOSTS = config.get('other', 'hosts').split(',')
+    HOSTS_DEMO_DICT = dict(
+        map(lambda x: x.split(":"),
+            config.get('other', 'hosts_demo_dict').split(',')))
+    SESSION_COOKIE_DOMAIN = config.get('other', 'demo_session_cookie_domain')
     CSRF_COOKIE_DOMAIN = SESSION_COOKIE_DOMAIN
     DOMAIN = config.get('other', 'domain')

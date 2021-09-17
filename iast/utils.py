@@ -147,3 +147,29 @@ def checkopenapistatus(openapiurl, token):
         logger.info("HealthView_{}:{}".format(openapiurl, e))
         return False, None
     return True, resp
+
+
+import tldextract
+from webapi.settings import HOSTS
+from webapi.settings import HOSTS_DEMO_DICT
+
+
+def parse_x_host(request):
+    x_host = request.META.get("HTTP_X_HOST")
+    if x_host is not None and _host_parse(x_host) in HOSTS:
+        return _host_parse(x_host)
+    return ''
+
+def _host_parse(host):
+    res = tldextract.extract(host)
+    return '.' + '.'.join(res[1:])
+
+
+def get_domain_from_x_host(request):
+    host = parse_x_host(request)
+    scheme = request.META.get('HTTP_X_SCHEME', '')
+    if host and scheme:
+        fulldomain = HOSTS_DEMO_DICT[host] + host
+        base_url = "{}://{}".format(scheme, fulldomain)
+        return base_url
+    return ''

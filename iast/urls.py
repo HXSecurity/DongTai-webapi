@@ -217,11 +217,12 @@ urlpatterns = [
     path('api_route/cover_rate', ApiRouteCoverRate.as_view()),
     path('health', HealthView.as_view()),
     path('oss/health', OssHealthView.as_view()),
-    path('github_contributors', GithubContributorsView.as_view()),
 ]
 if os.getenv('environment', None) in ('TEST', 'PROD'):
     # demo接口
-    urlpatterns.extend([path('demo', Demo.as_view())])
+    urlpatterns.extend([path('demo', Demo.as_view()),
+    path('github_contributors', GithubContributorsView.as_view()),
+        ])
 
 
 urlpatterns = format_suffix_patterns(urlpatterns)

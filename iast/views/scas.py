@@ -34,7 +34,7 @@ class ScaList(UserEndPoint):
             'project_name'
         ]
         order = order if order in order_fields + list(
-            map(lambda x: ''.join('-', x), order_fields)) else None
+            map(lambda x: ''.join(['-', x]), order_fields)) else None
 
         package_kw = request.query_params.get('keyword', None)
 

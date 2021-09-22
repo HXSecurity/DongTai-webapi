@@ -148,6 +148,7 @@ def checkopenapistatus(openapiurl, token):
         return False, None
     return True, resp
 
+import os 
 if os.getenv('environment', None) in ('TEST', 'PROD'):
     import tldextract
     from webapi.settings import HOSTS

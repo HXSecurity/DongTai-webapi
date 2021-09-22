@@ -15,7 +15,6 @@ from webapi import settings
 
 logger = logging.getLogger("django")
 from datetime import datetime
-from iast.utils import parse_x_host
 from webapi.settings import CSRF_COOKIE_NAME
 
 class UserLogout(AnonymousAuthEndPoint):
@@ -29,13 +28,17 @@ class UserLogout(AnonymousAuthEndPoint):
             "status": 201,
             "msg": _('Sign out successfully')
         })
-        host = parse_x_host(request)
-        if host:
-            response.delete_cookie('sessionid', domain=host)
-            response.delete_cookie(CSRF_COOKIE_NAME, domain=host)
-        else:
-            response.delete_cookie(key=settings.CSRF_COOKIE_NAME,
-                                   domain=settings.SESSION_COOKIE_DOMAIN)
-            response.delete_cookie(key='sessionid',
-                                   domain=settings.SESSION_COOKIE_DOMAIN)
+        import os
+        if os.getenv('environment', None) in ('TEST', 'PROD'):
+            from iast.utils import parse_x_host
+            from iast.utils import parse_x_host
+            host = parse_x_host(request)
+            if host:
+                response.delete_cookie('sessionid', domain=host)
+                response.delete_cookie(CSRF_COOKIE_NAME, domain=host)
+            else:
+                response.delete_cookie(key=settings.CSRF_COOKIE_NAME,
+                                       domain=settings.SESSION_COOKIE_DOMAIN)
+                response.delete_cookie(key='sessionid',
+                                       domain=settings.SESSION_COOKIE_DOMAIN)
         return response

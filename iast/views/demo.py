@@ -11,7 +11,6 @@ from dongtai.models.user import User
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.conf import settings
-from iast.utils import parse_x_host, get_domain_from_x_host
 from urllib.parse import urljoin
 from webapi.settings import CSRF_COOKIE_NAME
 
@@ -22,6 +21,7 @@ class Demo(UserEndPoint):
     description = "用户登录"
 
     def get(self, request):
+        from iast.utils import parse_x_host, get_domain_from_x_host
         user = User.objects.filter(username="demo").first()
         login(request, user)
         host = parse_x_host(request)

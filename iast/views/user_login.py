@@ -10,7 +10,6 @@ from dongtai.endpoint import UserEndPoint
 from django.utils.translation import gettext_lazy as _
 import time
 from django.http import JsonResponse
-from iast.utils import parse_x_host
 from webapi.settings import CSRF_COOKIE_NAME
 
 logger = logging.getLogger("dongtai-webapi")
@@ -42,10 +41,13 @@ class UserLogin(UserEndPoint):
                 if user is not None and user.is_active:
                     login(request, user)
                     res = R.success(msg=_('Login successful'))
-                    host = parse_x_host(request)
-                    if host:
-                        res.set_cookie('sessionid', domain=host)
-                        res.set_cookie(CSRF_COOKIE_NAME, domain=host)
+                    import os 
+                    if os.getenv('environment', None) in ('TEST', 'PROD'):
+                        from iast.utils import parse_x_host
+                        host = parse_x_host(request)
+                        if host:
+                            res.set_cookie('sessionid', domain=host)
+                            res.set_cookie(CSRF_COOKIE_NAME, domain=host)
                     return res
                 else:
                     logger.warn(

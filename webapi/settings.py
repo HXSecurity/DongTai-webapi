@@ -300,6 +300,8 @@ if os.getenv('environment', None) in ('TEST', 'PROD'):
     HOSTS_DEMO_DICT = dict(
         map(lambda x: x.split(":"),
             config.get('other', 'hosts_demo_dict').split(',')))
+    print(HOSTS)
+    print(HOSTS_DEMO_DICT)
     SESSION_COOKIE_DOMAIN = config.get('other', 'demo_session_cookie_domain')
     CSRF_COOKIE_DOMAIN = SESSION_COOKIE_DOMAIN
     DOMAIN = config.get('other', 'domain')

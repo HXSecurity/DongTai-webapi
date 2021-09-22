@@ -157,18 +157,21 @@ if os.getenv('environment', None) in ('TEST', 'PROD'):
 
     def parse_x_host(request):
         x_host = request.META.get("HTTP_X_HOST")
+        print("x_host")
+        print(x_host)
         if x_host is not None and _host_parse(x_host) in HOSTS:
             return _host_parse(x_host)
         return ''
 
     def _host_parse(host):
         res = tldextract.extract(host)
+        print("res")
         return '.' + '.'.join(res[1:])
 
 
     def get_domain_from_x_host(request):
         host = parse_x_host(request)
-        scheme = request.META.get('HTTP_X_SCHEME', '')
+        scheme = request.META.get('HTTP_X_HOST', '')
         if host and scheme:
             fulldomain = HOSTS_DEMO_DICT[host] + host
             base_url = "{}://{}".format(scheme, fulldomain)

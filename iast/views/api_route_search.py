@@ -133,8 +133,10 @@ class ApiRouteSearch(UserEndPoint):
             page_index = int(request.data.get('page_index', 1))
             uri = request.data.get('uri', None)
             http_method = request.data.get('http_method', None)
-            project_id = int(request.data.get('project_id', None))
+            project_id = request.data.get('project_id', None)
+            project_id = int(project_id) if project_id else None
             version_id = int(request.data.get('version_id', None))
+            version_id = int(version_id) if version_id else None
             exclude_id = request.data.get('exclude_ids', None)
             exclude_id = [int(i)
                           for i in exclude_id.split(',')] if exclude_id else None

@@ -62,13 +62,13 @@ class MessagesEndpoint(UserEndPoint):
         except ValidationError as e:
             return R.failure(data=e.detail)
         queryset = IastMessage.objects.filter(
-            to_user_id=request.user.id).order_by('is_read',
-                                                 'create_time').all()
+            to_user_id=request.user.id).order_by('-create_time').all()
         page_summary, messages = self.get_paginator(queryset, page, page_size)
+        messages_data = MessageSerializer(messages, many=True).data
         for message in messages:
             message.is_read = 1
             message.save(update_fields=['is_read'])
         return R.success(data={
-            'messages': MessageSerializer(messages, many=True).data,
+            'messages': messages_data,
             'page': page_summary
         }, )

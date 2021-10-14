@@ -110,7 +110,7 @@ from iast.views.filereplace import FileReplace
 from iast.views.messages_list import MessagesEndpoint
 from iast.views.messages_new import MessagesNewEndpoint
 from iast.views.messages_del import MessagesDelEndpoint
-
+from iast.views.messages_send import MessagesSendEndpoint
 
 urlpatterns = [
     path("talents", TalentEndPoint.as_view()),
@@ -228,6 +228,7 @@ urlpatterns = [
     path('message/list', MessagesEndpoint.as_view()),
     path('message/unread_count', MessagesNewEndpoint.as_view()),
     path('message/delete', MessagesDelEndpoint.as_view()),
+#    path('message/send', MessagesSendEndpoint.as_view()),
 ]
 if os.getenv('environment', None) in ('TEST', 'PROD'):
     # demo接口

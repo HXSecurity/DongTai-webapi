@@ -24,7 +24,7 @@ jobs:
         image: dongtai/dongtai-mysql
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping -uroot -pdongtai-iast --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: -v ./test/init.sql:/docker-entrypoint-initdb.d/update-99999999.sql --health-cmd="mysqladmin ping -uroot -pdongtai-iast --silent" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       #      - name: start-build
       #        uses: joelwmale/webhook-action@master

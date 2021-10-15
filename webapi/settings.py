@@ -180,8 +180,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'webapi.wsgi.application'
 
-if len(sys.argv) > 1 and sys.argv[1] in ('test', 'makemigrations',
-                                         'sqlmigrate', 'migrate') or os.getenv('database', None) == 'sqlite':
+if len(sys.argv) > 1 and sys.argv[1] in ('makemigrations', 'sqlmigrate',
+                                         'migrate') or os.getenv(
+                                             'database', None) == 'sqlite':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

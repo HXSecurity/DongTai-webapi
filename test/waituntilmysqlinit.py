@@ -3,21 +3,15 @@
 # @file        : waituntilmysqlfinish
 # @created     : 星期五 10月 15, 2021 15:43:54 CST
 #
-# @description :
+# @description : 
 ######################################################################
 
 
 import requests
-import pymysql
 import time
+res = requests.get('http://localhost:8000/api/v1/captcha')
 while True:
-    try:
-        pymysql.connect(host='127.0.0.1',
-                        user='root',
-                        password='dongtai-iast',
-                        database='dongtai-webapi')
+    res = requests.get('http://localhost:8000/api/v1/captcha/refresh')
+    time.sleep(10)
+    if res.status_code == 200:
         break
-    except Exception as e:
-        print(e)
-        time.sleep(10)
-        pass

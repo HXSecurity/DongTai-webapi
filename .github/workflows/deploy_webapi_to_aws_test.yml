@@ -52,7 +52,7 @@ jobs:
 
       - name: Init test database
         run: |
-          mysql -H localhost -P 3306 -uroot -p"dongtai-iast" -D dongtai_webapi -D test/init.sql 
+          mysql -H 127.0.0.1 -P 3306 -uroot -p"dongtai-iast" -D dongtai_webapi -D test/init.sql 
       
       - name: Django Testing project
         env:

@@ -9,6 +9,7 @@
 
 import requests
 import pymysql
+import time
 while True:
     try:
         pymysql.connect(host='127.0.0.1',
@@ -16,5 +17,7 @@ while True:
                         password='dongtai-iast',
                         database='dongtai-webapi')
         break
-    except:
+    except Exception as e:
+        print(e)
+        time.sleep(10)
         pass

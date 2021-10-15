@@ -1,0 +1,34 @@
+[mysql]
+host = localhost
+port = 3306
+name = dongtai-webapi
+user = root
+password = dongtai-iast
+
+[redis]
+host = redis_server
+port = redis_port
+password = redis_password
+db = broker_db
+
+[engine]
+url = http://engine_url
+
+[apiserver]
+url = http://api_server_url
+
+[smtp]
+server = smtp_server
+user = smtp_user
+password = smtp_password
+from_addr = from_addr
+ssl = False
+cc_addr = cc_addr
+
+[aliyun_oss]
+access_key = LTAI5t7pu9WUT2DcbknfNiaD
+access_key_secret = ZoEOSi7KfayQ7JalvJVHa37fdZ4XFY
+
+[other]
+domain = http://localhost.domain/
+demo_session_cookie_domain = .huoxian.cn

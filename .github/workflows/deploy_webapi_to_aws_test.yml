@@ -24,10 +24,7 @@ jobs:
         image: dongtai/dongtai-mysql
         ports:
           - 3306:3306
-        healthcheck:
-            test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-            timeout: 20s
-            retries: 10
+      options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       #      - name: start-build
       #        uses: joelwmale/webhook-action@master
@@ -36,6 +33,11 @@ jobs:
       #          body: '{"msg_type": "interactive","card": {"config": {"wide_screen_mode": true,"enable_forward": true},"elements": [{"tag": "div","text": {"content": "状态：构建开始\n项目：${{github.repository}}\n分支：${{github.ref}}\n流程：${{github.workflow}}\n构建编号：${{github.run_number}}\n触发事件：${{github.event_name}}\n提交人：${{github.actor}}\nSHA-1：${{github.sha}}\n","tag": "lark_md"}}]}}'
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Init test database
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -H 127.0.0.1 -P 3306 -uroot -p"dongtai-iast" -D dongtai_webapi -D test/init.sql 
+
       - name: Set up Python 3.7
         uses: actions/checkout@v1
         with:
@@ -54,9 +56,6 @@ jobs:
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Init test database
-        run: |
-          mysql -H 127.0.0.1 -P 3306 -uroot -p"dongtai-iast" -D dongtai_webapi -D test/init.sql 
         
 
       - name: Django Testing project

@@ -23,7 +23,7 @@ jobs:
       mysql:
         image: dongtai/dongtai-mysql
         ports:
-          - 3306
+          - 3306:3306
     steps:
       #      - name: start-build
       #        uses: joelwmale/webhook-action@master

@@ -44,7 +44,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo docker logs -f dongtai-mysql
           python -m pip install --upgrade pip
           pip install -r requirements-test.txt
 
@@ -70,8 +69,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           pip install schemathesis
-          python3 manage.py runserver 0.0.0.0:8000
-          python3 ./test/waituntilmysqlinit.py 
+          python3 manage.py runserver 0.0.0.0:8000 &
           schemathesis run --base-url "http://localhost:8000/"  -H 'Authorization: Token 67aebd78e700ad36a82a152276196b5f49fafeb0' ./swagger.json   
       
       - name: Checkout

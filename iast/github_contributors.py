@@ -93,4 +93,4 @@ def get_github_contributors(dic={}, update=False):
         if cache.get('github_contributors') is None or not any(
             [is_over_limit_pr, is_over_limit_issue]):
             cache.set('github_contributors', dic1, 60 * 180)
-    return cache.get('github_contributors')
+    return cache.get('github_contributors', default={})

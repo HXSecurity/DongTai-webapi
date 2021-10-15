@@ -104,7 +104,6 @@ from iast.views.api_route_related_request import ApiRouteRelationRequest
 from iast.views.api_route_cover_rate import ApiRouteCoverRate
 from iast.views.health import HealthView
 from iast.views.oss_health import OssHealthView
-from iast.views.github_contributors import GithubContributorsView
 from iast.views.program_language import ProgrammingLanguageList
 from iast.views.filereplace import FileReplace
 
@@ -224,9 +223,14 @@ urlpatterns = [
 ]
 if os.getenv('environment', None) in ('TEST', 'PROD'):
     # demo接口
-    urlpatterns.extend([path('demo', Demo.as_view()),
-    path('github_contributors', GithubContributorsView.as_view()),
-        ])
+    urlpatterns.extend([
+        path('demo', Demo.as_view()),
+    ])
+if os.getenv('githubcount', None) in ('true', ) or os.getenv('environment', None) in ('PROD',):
+    from iast.views.github_contributors import GithubContributorsView
+    urlpatterns.extend([
+        path('github_contributors', GithubContributorsView.as_view()),
+    ])
 
 
 urlpatterns = format_suffix_patterns(urlpatterns)

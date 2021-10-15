@@ -52,11 +52,9 @@ jobs:
 
       - name: Init test database
         run: |
-          sudo /lib/systemd/systemd-sysv-install enable mysql
-          sudo systemctl enable mysql.service
-          sudo systemctl start mysql.service
           mysql -H 127.0.0.1 -P 3306 -uroot -p"dongtai-iast" -D dongtai_webapi -D test/init.sql 
-      
+        
+
       - name: Django Testing project
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

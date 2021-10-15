@@ -42,6 +42,7 @@ jobs:
         run: |
           sudo apt-get install -y mysql-client libmysqlclient-dev
           ls
+          pip install pymysql
           python3 ./test/waituntilmysqlinit.py 
           mysql -h 127.0.0.1 -P 3306 -uroot -p"dongtai-iast" -D dongtai_webapi -D test/init.sql 
 

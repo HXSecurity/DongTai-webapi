@@ -35,7 +35,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Init test database
         run: |
-          mysqld -H 127.0.0.1 -P 3306 -uroot -p"dongtai-iast" -D dongtai_webapi -D test/init.sql 
+          sudo apt-get install -y mysql-client libmysqlclient-dev
+          mysql -H 127.0.0.1 -P 3306 -uroot -p"dongtai-iast" -D dongtai_webapi -D test/init.sql 
 
       - name: Set up Python 3.7
         uses: actions/checkout@v1

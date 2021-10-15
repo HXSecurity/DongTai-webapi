@@ -24,7 +24,7 @@ jobs:
         image: dongtai/dongtai-mysql
         ports:
           - 3306:3306
-        options:  --health-cmd="mysqladmin ping -uroot -pdongtai-iast --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --name dongtai-mysql -v /home/runner/work/DongTai-webapi/DongTai-webapi/test/init.sql:/docker-entrypoint-initdb.d/update-99999999.sql --health-cmd="mysqladmin ping -uroot -pdongtai-iast --silent" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       #      - name: start-build
       #        uses: joelwmale/webhook-action@master
@@ -44,7 +44,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          echo $PWD
           sudo docker logs -f dongtai-mysql
           python -m pip install --upgrade pip
           pip install -r requirements-test.txt

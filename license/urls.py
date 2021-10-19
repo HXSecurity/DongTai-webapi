@@ -18,23 +18,14 @@ from django.urls import include, path
 import os
 from webapi import settings
 from django.views.decorators.csrf import csrf_exempt
+from license.views import UploadLicense, DetailLicense
+from license.views import DeleteLicense, CurrentConcurrency, ShowMachineCode, IsAuthenticated
 
 urlpatterns = [
-    path('api/v1/', include('iast.urls')),
-    path('api/v1/license/', include('license.urls')),
+    path('upload_license', UploadLicense.as_view()),
+    path('detail_license', DetailLicense.as_view()),
+    path('current_concurrency', CurrentConcurrency.as_view()),
+    path('delete_license', DeleteLicense.as_view()),
+    path('machinecode', ShowMachineCode.as_view()),
+    path('is_authenticated', IsAuthenticated.as_view()),
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-if os.getenv('environment', 'PROD') in ('TEST', 'DOC'):
-    from drf_spectacular.views import SpectacularJSONAPIView, SpectacularRedocView, SpectacularSwaggerView
-    urlpatterns.extend([
-        path('api/XZPcGFKoxYXScwGjQtJx8u/schema/',
-             SpectacularJSONAPIView.as_view(),
-             name='schema'),
-        path('api/XZPcGFKoxYXScwGjQtJx8u/schema/swagger-ui/',
-             SpectacularSwaggerView.as_view(url_name='schema'),
-             name='swagger-ui'),
-        path('api/XZPcGFKoxYXScwGjQtJx8u/schema/redoc/',
-             SpectacularRedocView.as_view(url_name='schema'),
-             name='redoc'),
-    ])

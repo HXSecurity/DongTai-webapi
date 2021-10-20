@@ -24,15 +24,15 @@ class AgentSerializer(serializers.ModelSerializer):
     report_queue = serializers.SerializerMethodField()
     method_queue = serializers.SerializerMethodField()
     replay_queue = serializers.SerializerMethodField()
-    latest_request_time = serializers.SerializerMethodField()
     alias = serializers.SerializerMethodField()
+
     class Meta:
         model = IastAgent
         fields = [
             'id', 'token', 'server', 'running_status', 'system_load', 'owner',
             'latest_time', 'project_name', 'is_core_running', 'language',
             'flow', 'is_control', 'report_queue', 'method_queue',
-            'replay_queue', 'alias', 'latest_request_time', 'startup_time'
+            'replay_queue', 'alias', 'startup_time'
         ]
 
     def get_latest_heartbeat(self, obj):
@@ -63,7 +63,8 @@ class AgentSerializer(serializers.ModelSerializer):
         def get_server_addr():
             if obj.server_id not in self.SERVER_MAP:
                 if obj.server.ip and obj.server.port and obj.server.port != 0:
-                    self.SERVER_MAP[obj.server_id] = f'{obj.server.ip}:{obj.server.port}'
+                    self.SERVER_MAP[
+                        obj.server_id] = f'{obj.server.ip}:{obj.server.port}'
                 else:
                     return _('No flow is detected by the probe')
             return self.SERVER_MAP[obj.server_id]
@@ -81,7 +82,8 @@ class AgentSerializer(serializers.ModelSerializer):
         return self.get_user(obj)
 
     def get_flow(self, obj):
-        heartbeat = IastHeartbeat.objects.values('req_count').filter(agent=obj).first()
+        heartbeat = IastHeartbeat.objects.values('req_count').filter(
+            agent=obj).first()
         return heartbeat['req_count'] if heartbeat else 0
 
     def get_method_queue(self, obj):
@@ -99,11 +101,10 @@ class AgentSerializer(serializers.ModelSerializer):
             agent_id=obj.id).order_by('-dt').first()
         return heartbeat['replay_queue'] if heartbeat is not None else 0
 
-    def get_latest_request_time(self, obj):
-        update_time = MethodPool.objects.filter(
-            agent_id=obj.id).order_by('-update_time').values_list(
-                'update_time', flat=True).first()
-        return update_time
+    def get_startup_time(self, obj):
+        if obj.startup_time == 0:
+            return obj.latest_time
+        return obj.startup_time
 
     def get_alias(self, obj):
         if obj.alias == '':

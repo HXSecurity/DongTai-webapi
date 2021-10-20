@@ -10,7 +10,7 @@ from rest_framework import serializers
 
 from dongtai.models.agent import IastAgent
 from django.utils.translation import gettext_lazy as _
-
+from dongtai.models.agent_method_pool import MethodPool
 from collections import defaultdict
 
 class AgentSerializer(serializers.ModelSerializer):
@@ -24,14 +24,15 @@ class AgentSerializer(serializers.ModelSerializer):
     report_queue = serializers.SerializerMethodField()
     method_queue = serializers.SerializerMethodField()
     replay_queue = serializers.SerializerMethodField()
-
+    latest_request_time = serializers.SerializerMethodField()
+    alias = serializers.SerializerMethodField()
     class Meta:
         model = IastAgent
         fields = [
             'id', 'token', 'server', 'running_status', 'system_load', 'owner',
             'latest_time', 'project_name', 'is_core_running', 'language',
             'flow', 'is_control', 'report_queue', 'method_queue',
-            'replay_queue'
+            'replay_queue', 'alias' , 'latest_request_time'
         ]
 
     def get_latest_heartbeat(self, obj):
@@ -97,6 +98,17 @@ class AgentSerializer(serializers.ModelSerializer):
         heartbeat = IastHeartbeat.objects.values('replay_queue').filter(
             agent_id=obj.id).order_by('-dt').first()
         return heartbeat['replay_queue'] if heartbeat is not None else 0
+
+    def get_latest_request_time(self, obj):
+        update_time = MethodPool.objects.filter(
+            agent_id=obj.id).order_by('-update_time').values_list(
+                'update_time', flat=True).first()
+        return update_time
+
+    def get_alias(self, obj):
+        if obj.alias == '':
+            return obj.token
+        return obj.alias
 
 
 class ProjectEngineSerializer(serializers.ModelSerializer):

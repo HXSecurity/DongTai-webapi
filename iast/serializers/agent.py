@@ -32,7 +32,7 @@ class AgentSerializer(serializers.ModelSerializer):
             'id', 'token', 'server', 'running_status', 'system_load', 'owner',
             'latest_time', 'project_name', 'is_core_running', 'language',
             'flow', 'is_control', 'report_queue', 'method_queue',
-            'replay_queue', 'alias' , 'latest_request_time'
+            'replay_queue', 'alias', 'latest_request_time', 'startup_time'
         ]
 
     def get_latest_heartbeat(self, obj):

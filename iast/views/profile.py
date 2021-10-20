@@ -39,8 +39,11 @@ class ProfileEndpoint(UserEndPoint):
         except ValidationError as e:
             return R.failure(data=e.detail)
         try:
-            obj, created = IastProfile.objects.update_or_create(key=key,
-                                                                value=value)
+            obj, created = IastProfile.objects.update_or_create(
+                {
+                    'key': key,
+                    'value': value
+                }, key=key)
         except Exception as e:
             print(e)
             return R.failure(msg=_("Update {} failed").format(key))
@@ -86,7 +89,7 @@ class ProfileBatchModifiedEndpoint(UserEndPoint):
         try:
             for i in data:
                 obj, created = IastProfile.objects.update_or_create(
-                    **i)
+                    i, key=i['key'])
         except Exception as e:
             print(e)
             return R.failure(msg=_("Update configuration failed"))

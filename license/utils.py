@@ -57,7 +57,7 @@ def store_license(license):
         {
             'key': 'license',
             'value': license
-        }, key='license', value=license)
+        }, key='license')
     cache.set('license', license, 60 * 2)
     return created
 

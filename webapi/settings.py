@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'dongtai',
     'iast',
     'modeltranslation',
+    'license',
 ]
 
 
@@ -112,6 +113,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'license.views.LicenseCheckMiddleware'
 ]
 
 XFF_TRUSTED_PROXY_DEPTH = 20

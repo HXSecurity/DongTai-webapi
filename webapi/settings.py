@@ -114,6 +114,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 if os.getenv('pythonagent', None) == 'TRUE':
+    print(os.getenv('pythonagent', None))
     MIDDLEWARE.append('dongtai_agent_python.middlewares.django_middleware.FireMiddleware')
 
 XFF_TRUSTED_PROXY_DEPTH = 20
@@ -319,3 +320,4 @@ if os.getenv('environment', None) in ('TEST', 'PROD'):
                                             'demo_session_cookie_domain')
     CSRF_COOKIE_DOMAIN = SESSION_COOKIE_DOMAIN
     DOMAIN = config.get('other', 'domain')
+print(MIDDLEWARE)

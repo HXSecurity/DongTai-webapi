@@ -76,7 +76,7 @@ jobs:
           mysql --host=127.0.0.1 -uroot -p'dongtai-iast' -D dongtai_webapi < /home/runner/work/DongTai-webapi/DongTai-webapi/test/init.sql
           pip install schemathesis
           python3 manage.py runserver 0.0.0.0:8000 &
-          schemathesis run --base-url "http://localhost:8000/"  -H 'Authorization: Token 67aebd78e700ad36a82a152276196b5f49fafeb0' ./swagger.json   
+          schemathesis run --base-url "http://localhost:8000/"  -H 'Authorization: Token 67aebd78e700ad36a82a152276196b5f49fafeb0' ./swagger.json   --workers 8 
   Deploy-to-test:
     # The type of runner that the job will run on
     if: ${{ github.event_name == 'push' && github.repository_owner == 'HXSecurity' }}

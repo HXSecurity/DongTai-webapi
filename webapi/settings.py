@@ -113,8 +113,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-if os.getenv('pythonagent', None) == 'TRUE':
-    print(os.getenv('pythonagent', None))
+if os.getenv('PYTHON_AGENT', None) == 'TRUE':
+    print(os.getenv('PYTHON_AGENT', None))
     MIDDLEWARE.append('dongtai_agent_python.middlewares.django_middleware.FireMiddleware')
 
 XFF_TRUSTED_PROXY_DEPTH = 20

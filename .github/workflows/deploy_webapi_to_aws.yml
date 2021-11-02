@@ -62,12 +62,15 @@ jobs:
         run: sleep 120
 
       - name: Run UnitTest
+        env:
+          PYTHON_AGENT: TRUE
         run: |
           cp conf/config.ini.example conf/config.ini
           python3 manage.py test
       
       - name: Django Api Testing
         env:
+          PYTHON_AGENT: TRUE
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           mysql --host=127.0.0.1 -uroot -p'dongtai-iast' -D dongtai_webapi < /home/runner/work/DongTai-webapi/DongTai-webapi/test/init.sql

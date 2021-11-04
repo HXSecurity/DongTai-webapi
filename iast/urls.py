@@ -131,8 +131,6 @@ urlpatterns = [
     path('user/logout', UserLogout.as_view()),
     path('user/info', UserInfoEndpoint.as_view()),
     path('user/token', UserToken.as_view()),
-    path('user/register', UserRegisterEndPoint.as_view()),
-    path('user/register/<str:token>', UserRegisterEndPoint.as_view()),
     path('user/password/reset', UserPasswordReset.as_view()),
     path('captcha/', include('captcha.urls')),
     path(r'captcha/refresh', CaptchaCreate.as_view()),
@@ -183,7 +181,7 @@ urlpatterns = [
     path('agents/user', UserAgentList.as_view()),
     path('agent/install', AgentInstall.as_view()),
     path('agent/uninstall', AgentUninstall.as_view()),
-    path('agent/upgrade/online', AgentUpgradeOnline.as_view()),
+    #path('agent/upgrade/online', AgentUpgradeOnline.as_view()),
     #    path('agent/upgrade/offline', AgentUpgradeOffline.as_view()),
     path('agent/download', AgentDownload.as_view()),
     path('agent/status/update', AgentStatusUpdate.as_view()),
@@ -238,6 +236,8 @@ if os.getenv('environment', None) in ('TEST', 'PROD'):
     # demo接口
     urlpatterns.extend([
         path('demo', Demo.as_view()),
+        path('user/register', UserRegisterEndPoint.as_view()),
+        path('user/register/<str:token>', UserRegisterEndPoint.as_view()),
     ])
 if os.getenv('githubcount', None) in ('true', ) or os.getenv('environment', None) in ('PROD',):
     from iast.views.github_contributors import GithubContributorsView

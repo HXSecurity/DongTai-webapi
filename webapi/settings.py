@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'dongtai',
     'iast',
     'modeltranslation',
+    'license',
 ]
 
 
@@ -112,6 +113,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'license.views.LicenseCheckMiddleware'
 ]
 
 XFF_TRUSTED_PROXY_DEPTH = 20
@@ -182,16 +184,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'webapi.wsgi.application'
 
-if len(sys.argv) > 1 and sys.argv[1] in ('test', 'makemigrations',
-                                         'sqlmigrate', 'migrate') or os.getenv('database', None) == 'sqlite':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-else:
-    DATABASES = {
+#if len(sys.argv) > 1 and sys.argv[1] in ('makemigrations', 'sqlmigrate',
+#                                         'migrate') or os.getenv(
+#                                             'database', None) == 'sqlite':
+#    DATABASES = {
+#        'default': {
+#            'ENGINE': 'django.db.backends.sqlite3',
+#            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#        }
+#    }
+#else:
+DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'USER': config.get("mysql", 'user'),
@@ -201,7 +204,7 @@ else:
             'PORT': config.get("mysql", 'port'),
             'OPTIONS': {
                 'init_command': 'SET max_execution_time=20000;SET NAMES utf8mb4;SET collation_server=utf8mb4_general_ci;SET collation_database=utf8mb4_general_ci; ',
-                'charset': 'utf8',
+                'charset': 'utf8mb4',
                 'use_unicode': True,
             },
         }
@@ -285,6 +288,7 @@ EMAIL_SERVER = config.get('smtp', 'server')
 EMAIL_USER = config.get('smtp', 'user')
 EMAIL_PASSWORD = config.get('smtp', 'password')
 EMAIL_FROM_ADDR = config.get('smtp', 'from_addr')
+EMAIL_PORT = config.get('smtp', 'port')
 ENABLE_SSL = config.get('smtp', 'ssl') == 'True'
 ADMIN_EMAIL = config.get('smtp', 'cc_addr')
 SESSION_COOKIE_DOMAIN = None

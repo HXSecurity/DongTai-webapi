@@ -35,6 +35,9 @@ spec:
           env:
             - name: "environment"
               value: "TEST"
+           env:
+            - name: "pythonagent"
+              value: "TRUE"
       volumes:
         - name: configfile
           configMap:

@@ -25,4 +25,5 @@ uwsgi==2.0.19.1
 ddt
 faker
 pycryptodomex
-https://huoqi-public.oss-cn-beijing.aliyuncs.com/iast/dongtai-latest.tar.gz
+/opt/dongtai/webapi/dongtai-latest.tar.gz
+

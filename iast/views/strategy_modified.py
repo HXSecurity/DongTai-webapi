@@ -5,6 +5,7 @@ from dongtai.models.strategy import IastStrategyModel
 from iast.utils import extend_schema_with_envcheck, get_response_serializer
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from dongtai.endpoint import TalentAdminEndPoint
 
 _ResponseSerializer = get_response_serializer()
 
@@ -19,7 +20,7 @@ class StrategyCreateSerializer(serializers.Serializer):
         "Suggestions for repairing vulnerabilities corresponding to the strategy"
     ))
 
-class StrategyModified(UserEndPoint):
+class StrategyModified(TalentAdminEndPoint):
 
     @extend_schema_with_envcheck(
         request=StrategyCreateSerializer,
@@ -31,12 +32,13 @@ class StrategyModified(UserEndPoint):
         response_schema=_ResponseSerializer,
     )
     def put(self, request, id_):
-        fields = ['vul_name', 'vul_desc', 'vul_fix', 'state','level_id']
+        fields = ['vul_type','vul_name', 'vul_desc', 'vul_fix', 'state','level_id']
         data = {k: v for k, v in request.data.items() if k in fields}
         strategy = IastStrategyModel.objects.filter(
             pk=id_).first()
-        HookType.objects.filter(strategy=strategy,type=4).update(name=data['vul_name'])
-        HookType.objects.filter(strategy=strategy,type=3).update(name=data['vul_name']+'filter')
+        _update(strategy,data)
+        HookType.objects.filter(vul_strategy=strategy,type=4).update(name=data['vul_name'])
+        HookType.objects.filter(vul_strategy=strategy,type=3).update(name=data['vul_name'])
         return R.success(data={'id':id_})
         hook_type = HookType.objects.filter(pk=id_).first()
         _update(hook_type, data)

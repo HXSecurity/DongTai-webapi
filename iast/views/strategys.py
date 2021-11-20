@@ -20,7 +20,8 @@ from rest_framework import serializers
 from dongtai.models.program_language import IastProgramLanguage
 import time 
 from rest_framework.serializers import ValidationError
-
+from dongtai.permissions import TalentAdminPermission
+from rest_framework.decorators import permission_classes
 class _StrategyResponseDataStrategySerializer(serializers.Serializer):
     id = serializers.CharField(help_text=_('The id of agent'))
     vul_name = serializers.CharField(help_text=_('The name of the vulnerability type targeted by the strategy'))
@@ -53,16 +54,40 @@ _ResponseSerializer = get_response_serializer(
 
 
 class _StrategyArgsSerializer(serializers.Serializer):
-    page_size = serializers.IntegerField(default=20,
-                                         help_text=_('Number per page'))
-    page = serializers.IntegerField(default=1, help_text=_('Page index'))
+    page_size = serializers.IntegerField(default=None,help_text=_('Number per page'))
+    page = serializers.IntegerField(default=None,help_text=_('Page index'))
     name = serializers.CharField(
         default=None,
         help_text=_(
             "The name of the item to be searched, supports fuzzy search."))
 
 STATUS_DELETE = 'delete'
+
 class StrategyEndpoint(UserEndPoint):
+    
+    @extend_schema_with_envcheck(
+        tags=[_('Strategy')],
+        summary=_('Strategy retrieve'),
+        description=_(
+            "Get a strategiey by id."
+        ),
+        response_schema=_ResponseSerializer,
+    )
+    def get(self, request, pk):
+        q = ~Q(state=STATUS_DELETE)
+        q = q & Q(pk=pk)
+        queryset = IastStrategyModel.objects.filter(q).first()
+        return R.success(data=StrategySerializer(queryset).data,)
+
+class StrategysEndpoint(UserEndPoint):
+    permission_classes_by_action = {'POST':(TalentAdminPermission,)}
+
+    def get_permissions(self):
+      try:
+        return [permission() for permission in self.permission_classes_by_action[self.request.method]]
+      except KeyError:
+        return [permission() for permission in self.permission_classes]
+    
     @extend_schema_with_envcheck(
         [_StrategyArgsSerializer],
         tags=[_('Strategy')],
@@ -84,10 +109,13 @@ class StrategyEndpoint(UserEndPoint):
         q = ~Q(state=STATUS_DELETE)
         if name:
             q = q & Q(vul_name__icontains=name)
-        queryset = IastStrategyModel.objects.filter(q).all()
-        page_summary, page_data = self.get_paginator(queryset, page, page_size)
-        return R.success(data=StrategySerializer(page_data, many=True).data,
+        queryset = IastStrategyModel.objects.filter(q).order_by('-id').all()
+        if page and page_size:
+            page_summary, page_data = self.get_paginator(queryset, page, page_size)
+            return R.success(data=StrategySerializer(page_data, many=True).data,
                          page=page_summary)
+        else:
+            return R.success(data=StrategySerializer(queryset, many=True).data,)
         
         strategy_models = HookType.objects.values(
             'id', 'name', 'value',

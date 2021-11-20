@@ -32,6 +32,7 @@ from django.db.models import Q
 from dongtai.models.sensitive_info import IastPatternType,IastSensitiveInfoRule
 import jq
 import re
+from dongtai.permissions import TalentAdminPermission
 
 class SensitiveInfoRuleSerializer(serializers.ModelSerializer):
     strategy_name = serializers.SerializerMethodField()
@@ -47,6 +48,7 @@ class SensitiveInfoRuleSerializer(serializers.ModelSerializer):
 
     def get_strategy_id(self,obj):
         return obj.strategy.id
+    
     def get_pattern_type_id(self,obj):
         return obj.pattern_type.id
     def get_pattern_type_name(self,obj):
@@ -83,6 +85,17 @@ class _RegexPatternValidationSerializer(serializers.Serializer):
     test_data = serializers.CharField(help_text=_('the data for test regex'))
   
 class SensitiveInfoRuleViewSet(UserEndPoint,viewsets.ViewSet):
+    
+    permission_classes_by_action = {'create':(TalentAdminPermission,),
+                                'update':(TalentAdminPermission,),
+                                'destory':(TalentAdminPermission,),}
+
+    def get_permissions(self):
+      try:
+        return [permission() for permission in self.permission_classes_by_action[self.action]]
+      except KeyError:
+        return [permission() for permission in self.permission_classes]
+
     @extend_schema_with_envcheck(
         [_SensitiveInfoArgsSerializer],
         tags=[_('SensitiveInfoRule')],
@@ -112,7 +125,7 @@ class SensitiveInfoRuleViewSet(UserEndPoint,viewsets.ViewSet):
         return R.success(data=SensitiveInfoRuleSerializer(page_data,many=True).data,page=page_summary)
     
     @extend_schema_with_envcheck(
-        request=SensitiveInfoRuleCreateSerializer,
+            request=SensitiveInfoRuleCreateSerializer,
         tags=[_('SensitiveInfoRule')],
         summary=_('SensitiveInfoRule Create'),
         description=
@@ -164,7 +177,7 @@ class SensitiveInfoRuleViewSet(UserEndPoint,viewsets.ViewSet):
         except ValidationError as e:
             return R.failure(data=e.detail)
         obj = IastSensitiveInfoRule.objects.filter(pk=pk).update(**ser.validated_data,latest_time=time.time())
-        return R.success(msg='update success',data=SensitiveInfoRuleSerializer(obj).data)
+        return R.success(msg='update success')
     @extend_schema_with_envcheck(
         tags=[_('SensitiveInfoRule')],
         summary=_('SensitiveInfoRule delete'),
@@ -247,8 +260,8 @@ def regextest(test_data,pattern):
         data = ''
         status = 0
         return data,status 
-    ret = regex.match(test_data)
-    data = ret.group() if ret else ''
+    ret = regex.findall(test_data)
+    data = ret[0] if ret else ['']
     return data,1
 def jsontest(test_data,pattern):
     try:

@@ -1,6 +1,6 @@
 # DongTai-webapi
 [![django-project](https://img.shields.io/badge/django%20versions-3.0.3-blue)](https://www.djangoproject.com/)
-[![DongTai-project](https://img.shields.io/badge/DongTai%20versions-beta-green)](https://https://github.com/HXSecurity/DongTai)
+[![DongTai-project](https://img.shields.io/badge/DongTai%20versions-beta-green)](https://github.com/HXSecurity/DongTai)
 [![DongTai-webapi](https://img.shields.io/github/v/release/HXSecurity/Dongtai-webapi?label=Dongtai-webapi)](https://github.com/HXSecurity/DongTai-webapi/releases)
 [![Release DongTai WebApi](https://github.com/HXSecurity/DongTai-webapi/actions/workflows/release_webapi.yml/badge.svg)](https://github.com/HXSecurity/DongTai-webapi/actions/workflows/release_webapi.yml)
 
@@ -108,7 +108,7 @@ The address is `http://<containerip:port>/api/XZPcGFKoxYXScwGjQtJx8u/schema/`
 3. The specific API authentication mode has been included in the API document, and the corresponding token can be found on the installation agent part of the web.
 
 ### More resources
-- [Documentation](https://hxsecurity.github.io/DongTai-Doc/#/en-us/)
+- [Documentation](https://doc.dongtai.io/)
 - [DongTai WebSite](https://iast.io)
 
 <img src="https://static.scarf.sh/a.png?x-pxid=44779bf0-9262-4801-bb88-4a36ee0fdcfe" />

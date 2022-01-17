@@ -245,8 +245,8 @@ class SCAStatViewSet(UserEndPoint):
     def get(self, request):
         sca_count = ScaMavenDb.objects.filter(
             import_from=ImportFrom.USER).count()
-        vuln_count = ScaArtifactDb.objects.filter(
-            import_from=ImportFrom.USER).count()
+        # vuln_count = ScaArtifactDb.objects.filter(
+        #     import_from=ImportFrom.USER).count()
         try:
             res = get_packge_from_sca_lib(page_size=1)
             sca_count = sca_count + res['page']['alltotal']
@@ -254,5 +254,5 @@ class SCAStatViewSet(UserEndPoint):
             pass
         return R.success(data={
             'sca_count': sca_count,
-            'vuln_count': vuln_count,
+            'vuln_count': 0,
         })

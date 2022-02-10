@@ -20,7 +20,7 @@ from iast.serializers.vul import VulSerializer
 from django.utils.translation import gettext_lazy as _
 from iast.utils import extend_schema_with_envcheck, get_response_serializer
 from rest_framework import serializers
-
+import time
 logger = logging.getLogger('dongtai-webapi')
 
 
@@ -77,6 +77,7 @@ class _VulDetailResponseDataSerializer(serializers.Serializer):
     strategy = _VulDetailResponseDataStrategySerializer()
 
 _ResponseSerializer = get_response_serializer(_VulDetailResponseDataSerializer())
+
 
 class VulDetail(UserEndPoint):
 
@@ -344,15 +345,22 @@ class VulDetail(UserEndPoint):
         :param request:
         :return:
         """
+        print("======")
+        print(time.time())
         self.vul_id = id
         auth_agents = self.get_auth_agents_with_user(request.user)
         try:
+            print("====0000000===")
+            print(time.time())
+            data = {
+                'vul': self.get_vul(auth_agents),
+                'server': self.get_server(),
+                'strategy': self.get_strategy()
+            }
+            print("======----------")
+            print(time.time())
             return R.success(
-                data={
-                    'vul': self.get_vul(auth_agents),
-                    'server': self.get_server(),
-                    'strategy': self.get_strategy()
-                }
+                data
             )
         except Exception as e:
             logger.error(_('[{}] Vulnerability information parsing error, error message: {}').format(__name__,e))

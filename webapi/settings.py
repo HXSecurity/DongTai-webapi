@@ -347,6 +347,10 @@ X_FRAME_OPTIONS = 'DENY'
 TEST_RUNNER = 'test.NoDbTestRunner'
 
 
+if os.getenv('environment', None) == 'TEST' or os.getenv('REQUESTLOG',
+                                                         None) == 'TRUE':
+    MIDDLEWARE.insert(0, 'apitimelog.middleware.RequestLogMiddleware')
+    
 
 if os.getenv('environment', None) == 'TEST' or os.getenv('PYTHONAGENT', None) == 'TRUE':
     MIDDLEWARE.insert(0, 'dongtai_agent_python.middlewares.django_middleware.FireMiddleware')
@@ -388,3 +392,4 @@ if os.getenv('environment', None) in ('TEST', 'PROD'):
                                             'demo_session_cookie_domain')
     CSRF_COOKIE_DOMAIN = SESSION_COOKIE_DOMAIN
     DOMAIN = config.get('other', 'domain')
+    

@@ -141,8 +141,8 @@ python -m pip install -r requirements-test.txt
 
 - 拉取版本对应的数据库镜像并启动镜像
 ```
-docker pull  dongtai/dongtai-mysql:latest 
-docker run -itd --name dongtai-mysql -p 3306:3306 dongtai/dongtai-mysql:latest
+docker pull  dongtai/dongtai-mysql:1.3.1 
+docker run -itd --name dongtai-mysql -p 3306:3306 dongtai/dongtai-mysql:1.3.1
 ```
 
 若需要创建或修改数据库表，请参照[DongTai-Base-Image](https://github.com/HXSecurity/Dongtai-Base-Image)仓库规范，并提交相关更改的.sql文件
@@ -168,11 +168,11 @@ debug=true 开启debug模式
 
 1. 启动容器时加上文档相关的参数:
 ```
-$ docker run -d -p 8000:8000 --restart=always -e environment=DOC --name dongtai-webapi huoxian/dongtai-webapi:latest
+$ docker run -d -p 8000:8000 --restart=always -e environment=DOC --name dongtai-webapi huoxian/dongtai-webapi:1.3.1
 ```
 此处需要启动对应的mysql数据库，如果仅希望单独启动webapi项目查看文档，则需额外加上以下参数 `-e database=sqlite`（仅为单独启动webapi项目查看文档，不保证在sqlite下的兼容性),完整命令为:
 ```
-$ docker run -d -p 8000:8000 --restart=always -e environment=DOC -e database=sqlite --name dongtai-webapi huoxian/dongtai-webapi:latest
+$ docker run -d -p 8000:8000 --restart=always -e environment=DOC -e database=sqlite --name dongtai-webapi huoxian/dongtai-webapi:1.3.1
 ```
 
 2. 访问容器中对应的API:
@@ -201,8 +201,8 @@ Redoc地址为 `http://<containerip:port>/api/XZPcGFKoxYXScwGjQtJx8u/schema/redo
 
 - 拉取版本对应的数据库镜像
 ```
-docker pull  registry.cn-beijing.aliyuncs.com/huoxian_pub/dongtai-mysql:latest 
-docker run -itd --name dongtai-mysql -p 3306:3306 registry.cn-beijing.aliyuncs.com/huoxian_pub/dongtai-mysql:latest 
+docker pull  registry.cn-beijing.aliyuncs.com/huoxian_pub/dongtai-mysql:1.3.1 
+docker run -itd --name dongtai-mysql -p 3306:3306 registry.cn-beijing.aliyuncs.com/huoxian_pub/dongtai-mysql:1.3.1 
 ```
 
 
@@ -214,12 +214,12 @@ docker run -itd --name dongtai-mysql -p 3306:3306 registry.cn-beijing.aliyuncs.c
 
 3.构建镜像
 ```
-$ docker build -t huoxian/dongtai-webapi:latest .
+$ docker build -t huoxian/dongtai-webapi:1.3.1 .
 ```
 
 4.启动容器
 ```
-$ docker run -d -p 8000:8000 --restart=always --name dongtai-webapi huoxian/dongtai-webapi:latest
+$ docker run -d -p 8000:8000 --restart=always --name dongtai-webapi huoxian/dongtai-webapi:1.3.1
 ```
 
 
@@ -239,8 +239,8 @@ python -m pip install -r requirements-prod.txt
 或采用docker部署数据库
 - 拉取版本对应的数据库镜像并启动镜像
 ```
-docker pull  dongtai/dongtai-mysql:latest 
-docker run -itd --name dongtai-mysql -p 3306:3306 dongtai/dongtai-mysql:latest
+docker pull  dongtai/dongtai-mysql:1.3.1 
+docker run -itd --name dongtai-mysql -p 3306:3306 dongtai/dongtai-mysql:1.3.1
 ```
 
 

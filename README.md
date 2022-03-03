@@ -141,8 +141,8 @@ Note: jq cannot be installed under windows, jq is used to process json parsing o
 
 - Pull the database mirror corresponding to the version and start the mirror
 ```
-docker pull dongtai/dongtai-mysql:latest
-docker run -itd --name dongtai-mysql -p 3306:3306 dongtai/dongtai-mysql:latest
+docker pull dongtai/dongtai-mysql:1.3.1
+docker run -itd --name dongtai-mysql -p 3306:3306 dongtai/dongtai-mysql:1.3.1
 ```
 
 If you need to create or modify the database table, please refer to the [DongTai-Base-Image](https://github.com/HXSecurity/Dongtai-Base-Image) specification and submit the relevant modified .sql file
@@ -172,11 +172,11 @@ If you need to create or modify the database table, please refer to the [DongTai
 
 1. Add document-related parameters when starting the container :
 ```
-$ docker run -d -p 8000:8000 --restart=always -e environment=DOC --name dongtai-webapi huoxian/dongtai-webapi:latest
+$ docker run -d -p 8000:8000 --restart=always -e environment=DOC --name dongtai-webapi huoxian/dongtai-webapi:1.3.1
 ```
 Here you need to start the corresponding mysql database. If you only want to start the webapi project to view the document, you need to add the following parameter `-e database=sqlite` (only start the webapi project to view the document, and does not guarantee the compatibility under sqlite ), the complete command is:
 ```
-$ docker run -d -p 8000:8000 --restart=always -e environment=DOC -e database=sqlite --name dongtai-webapi huoxian/dongtai-webapi:latest
+$ docker run -d -p 8000:8000 --restart=always -e environment=DOC -e database=sqlite --name dongtai-webapi huoxian/dongtai-webapi:1.3.1
 ```
 
 2. Access the corresponding API in the container:
@@ -204,8 +204,8 @@ The address is `http://<containerip:port>/api/XZPcGFKoxYXScwGjQtJx8u/schema/`
 - Pull the corresponding database images and run it
 
 ```
-docker pull  registry.cn-beijing.aliyuncs.com/huoxian_pub/dongtai-mysql:latest 
-docker run -itd --name dongtai-mysql -p 3306:3306 registry.cn-beijing.aliyuncs.com/huoxian_pub/dongtai-mysql:latest 
+docker pull  registry.cn-beijing.aliyuncs.com/huoxian_pub/dongtai-mysql:1.3.1 
+docker run -itd --name dongtai-mysql -p 3306:3306 registry.cn-beijing.aliyuncs.com/huoxian_pub/dongtai-mysql:1.3.1 
 ```
 
 2. Modify the configuration file
@@ -216,12 +216,12 @@ Copy the configuration file `conf/config.ini.example` to `conf/config.ini` and c
 
 3.Build the image
 ```
-$ docker build -t huoxian/dongtai-webapi:latest .
+$ docker build -t huoxian/dongtai-webapi:1.3.1 .
 ```
 
 4.Start the container
 ```
-$ docker run -d -p 8000:8000 --restart=always --name dongtai-webapi huoxian/dongtai-webapi:latest
+$ docker run -d -p 8000:8000 --restart=always --name dongtai-webapi huoxian/dongtai-webapi:1.3.1
 ```
 
 
@@ -242,8 +242,8 @@ OR use docker way to host a database
 
 - Pull the corresponding database images and run it
 ```
-docker pull  dongtai/dongtai-mysql:latest 
-docker run -itd --name dongtai-mysql -p 3306:3306 dongtai/dongtai-mysql:latest 
+docker pull  dongtai/dongtai-mysql:1.3.1 
+docker run -itd --name dongtai-mysql -p 3306:3306 dongtai/dongtai-mysql:1.3.1 
 ```
 
 

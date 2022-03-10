@@ -33,7 +33,7 @@ if os.getenv('environment', 'PROD') in ('TEST', 'DOC') or os.getenv('DOC', None)
         path('api/XZPcGFKoxYXScwGjQtJx8u/schema/swagger-ui/',
              SpectacularSwaggerView.as_view(url_name='schema'),
              name='swagger-ui'),
-        path('c',
+        path('api/XZPcGFKoxYXScwGjQtJx8u/schema/redoc/',
              SpectacularRedocView.as_view(url_name='schema'),
              name='redoc'),
     ])

@@ -3,7 +3,7 @@
 # author:owefsad
 # software: PyCharm
 # project: lingzhi-webapi
-
+import time
 from dongtai.endpoint import R
 from dongtai.endpoint import UserEndPoint
 from dongtai.models.vul_level import IastVulLevel
@@ -11,7 +11,7 @@ from dongtai.models.vulnerablity import IastVulnerabilityModel
 from dongtai.models.strategy import IastStrategyModel
 
 from iast.base.agent import get_agents_with_project, get_user_project_name, \
-    get_user_agent_pro, get_all_server
+    get_user_agent_pro, get_all_server,get_user_agent_pro_by_agent_id
 from iast.base.project_version import get_project_version, get_project_version_by_id
 from iast.serializers.vul import VulSerializer
 from django.utils.translation import gettext_lazy as _
@@ -279,13 +279,10 @@ class VulsEndPoint(UserEndPoint):
         q = ~Q(hook_type_id=0)
         queryset = queryset.filter(q)
         projects_info = get_user_project_name(auth_users)
-        agentArr = get_user_agent_pro(auth_users, projects_info.keys())
-        agentPro = agentArr['pidArr']
-        agentServer = agentArr['serverArr']
-        server_ids = agentArr['server_ids']
-        allServer = get_all_server(server_ids)
+        # server_ids = agentArr['server_ids']
         allType = IastVulLevel.objects.all().order_by("id")
         allTypeArr = {}
+
         if allType:
             for item in allType:
                 allTypeArr[item.id] = item.name_value
@@ -293,21 +290,31 @@ class VulsEndPoint(UserEndPoint):
         page = request.query_params.get('page', 1)
         page_size = request.query_params.get("pageSize", 20)
         page_summary, page_data = self.get_paginator(queryset, page, page_size)
+        # need todo change
         datas = VulSerializer(page_data, many=True).data
         pro_length = len(datas)
         if pro_length > 0:
+            need_ids = []
+            agent_ids = []
+            for ind in range(pro_length):
+                item = datas[ind]
+                agent_ids.append(item['agent_id'])
+                # need_ids.append(agentServer.get(item['agent_id'], 0))
+            # edit by song
+            agentArr = get_user_agent_pro_by_agent_id(agent_ids)
+            agentPro = agentArr['pidArr']
+            # agentServer = agentArr['serverArr']
+            agentServerName = agentArr['serverNameArr']
+            # allServer = get_all_server(need_ids)
+
             for index in range(pro_length):
                 item = datas[index]
                 item['index'] = index
-                item['project_name'] = projects_info.get(
-                    agentPro.get(item['agent_id'], 0),
-                    _("The application has not been binded"))
+                item['project_name'] = projects_info.get(agentPro.get(item['agent_id'], 0), _("The application has not been binded"))
                 item['project_id'] = agentPro.get(item['agent_id'], 0)
-                item['server_name'] = allServer.get(
-                    agentServer.get(item['agent_id'], 0), "JavaApplication")
-                item['server_type'] = VulSerializer.split_container_name(
-                    item['server_name'])
-
+                # item['server_name'] = allServer.get(agentServer.get(item['agent_id'], 0), "JavaApplication")
+                item['server_name'] = agentServerName.get(item['agent_id'], "JavaApplication")
+                item['server_type'] = VulSerializer.split_container_name( item['server_name'])
                 item['level_type'] = item['level_id']
                 item['level'] = allTypeArr.get(item['level_id'], "")
                 end['data'].append(item)

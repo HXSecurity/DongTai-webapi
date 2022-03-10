@@ -65,6 +65,23 @@ def get_user_agent_pro(auth_users, bindId):
     return result
 
 
+# add by song
+def get_user_agent_pro_by_agent_id(ids):
+    agentInfo = IastAgent.objects.filter(id__in=ids).values("id", "bind_project_id", "server_id","server__container")
+    result = {
+        "pidArr": {},
+        "serverArr": {},
+        "serverNameArr": {}
+    }
+    if agentInfo:
+        for item in agentInfo:
+
+            result["pidArr"][item['id']] = item['bind_project_id']
+            result["serverNameArr"][item['id']] = item['server__container']
+            result["serverArr"][item['id']] = item['server_id']
+    return result
+
+
 def get_all_server(ids):
     alls = IastServer.objects.filter(id__in=ids).values("id", "container")
     result = {}

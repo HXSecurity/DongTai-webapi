@@ -186,14 +186,14 @@ class VulSummaryProject(UserEndPoint):
         if vul_type:
             hook_types = HookType.objects.filter(name=vul_type).all()
             strategys = IastStrategyModel.objects.filter(vul_name=vul_type).all()
-            q = Q(hook_type__in=hook_types, strategy_id=0) | Q(strategy__in=strategys)
+            q = Q(hook_type__in=hook_types) | Q(strategy__in=strategys)
             queryset = queryset.filter(q)
 
         url = request.query_params.get('url')
         if url and url != '':
             queryset = queryset.filter(url__icontains=url)
 
-        q = ~Q(hook_type_id=0)
+        q = Q()
         queryset = queryset.filter(q)
 
         agent_count = queryset.values('agent_id').annotate(count=Count('agent_id'))

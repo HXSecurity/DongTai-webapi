@@ -119,6 +119,7 @@ USE_I18N = True
 USE_L10N = True
 MODELTRANSLATION_FALLBACK_LANGUAGES = ('zh', 'en')
 MIDDLEWARE = [
+    # 'dongtai_agent_python.middlewares.django_middleware.FireMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'utils.CSPMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

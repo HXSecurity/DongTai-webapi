@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'captcha',
-    # 'dongtai',
+    'dongtai',
     'modeltranslation',
 ]
 def get_installed_apps():
